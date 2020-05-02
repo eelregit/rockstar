@@ -36,7 +36,7 @@ void find_parents(int64_t ngroups) {
   float range;
 
   halo_order = check_realloc(halo_order, sizeof(int64_t)*ngroups,
-			     "Allocating halo order.");
+                             "Allocating halo order.");
   halo_tree = fast3tree_init(ngroups, GROUP_LIST);
 #ifndef NO_PERIODIC_BOUNDARIES
   _fast3tree_set_minmax(halo_tree, 0, BOX_SIZE);
@@ -68,9 +68,9 @@ void find_parents(int64_t ngroups) {
     for (j=0; j<nearest->num_points; j++) {
       h2 = nearest->points[j];
       if (h2->RADIUS < h1->RADIUS) {
-	h2->parent = h1->id;
+        h2->parent = h1->id;
 #ifdef TAG_MAJOR_MERGERS
-	if (h2->vmax > 0.6*h1->vmax) h2->mm = h1->mm = 1;
+        if (h2->vmax > 0.6*h1->vmax) h2->mm = h1->mm = 1;
 #endif /*TAG_MAJOR_MERGERS */
       }
     }

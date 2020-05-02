@@ -9,7 +9,7 @@
 
 struct fof *fofs = NULL;
 struct smallfof *smallfofs = NULL;
-int64_t num_fofs=0, num_alloced_fofs = 0, 
+int64_t num_fofs=0, num_alloced_fofs = 0,
   num_smallfofs = 0, num_alloced_smallfofs = 0;
 struct particle *root_p = 0;
 int64_t *particle_smallfofs = NULL;
@@ -19,9 +19,9 @@ int64_t num_boundary_fofs = 0;
 void init_particle_smallfofs(int64_t num_p, struct particle *particles) {
   int64_t i;
   if (num_p > num_alloced_particles) {
-    particle_smallfofs = 
+    particle_smallfofs =
       check_realloc(particle_smallfofs, sizeof(int64_t)*num_p,
-		    "Allocating particle smallfof links.");
+                    "Allocating particle smallfof links.");
     num_alloced_particles = num_p;
   }
   for (i=0; i<num_p; i++) particle_smallfofs[i] = -1;
@@ -34,7 +34,7 @@ int64_t add_new_smallfof(void) {
   if (num_smallfofs >= num_alloced_smallfofs) {
     smallfofs = (struct smallfof *)
       check_realloc(smallfofs, sizeof(struct smallfof)*(num_smallfofs+1000),
-		    "Allocating SmallFOFs.\n");
+                    "Allocating SmallFOFs.\n");
     num_alloced_smallfofs += 1000;
   }
   smallfofs[num_smallfofs].root = num_smallfofs;
@@ -132,7 +132,7 @@ int64_t add_new_fof(void) {
   if (num_fofs >= num_alloced_fofs) {
     fofs = (struct fof *)
       check_realloc(fofs, sizeof(struct fof)*(num_fofs+1000),
-		    "Allocating FOFs.\n");
+                    "Allocating FOFs.\n");
     memset(fofs + num_fofs, 0, sizeof(struct fof)*1000);
     num_alloced_fofs = num_fofs + 1000;
   }
@@ -141,7 +141,7 @@ int64_t add_new_fof(void) {
 }
 
 void partition_sort_particles(int64_t min, int64_t max,
-		struct particle *particles, int64_t *assignments) {  
+                struct particle *particles, int64_t *assignments) {
   int64_t minpivot, maxpivot, pivot, i, si, tmp;
   struct particle tmp_p;
   if (max-min < 2) return;
@@ -155,9 +155,9 @@ void partition_sort_particles(int64_t min, int64_t max,
   pivot = minpivot + (maxpivot-minpivot)/2;
   si = max-1;
 #define SWAP(a,b) {tmp_p = particles[a]; particles[a] = particles[b]; \
-    particles[b] = tmp_p; tmp = assignments[a];			      \
+    particles[b] = tmp_p; tmp = assignments[a];                              \
     assignments[a] = assignments[b];  assignments[b] = tmp;}
-  
+
   for (i=min; i<si; i++)
     if (assignments[i] > pivot) { SWAP(i, si); si--; i--; }
   if (i==si && assignments[si]<=pivot) si++;
@@ -176,15 +176,15 @@ void build_fullfofs(void) {
     if (sf != last_sf) {
       if (f>-1) { fofs[f].num_p = (root_p + i) - fofs[f].particles; }
       if ((f < 0) || (fofs[f].num_p >= MIN_HALO_PARTICLES) ||
-	  last_sf >= num_smallfofs-num_boundary_fofs) f=add_new_fof();
+          last_sf >= num_smallfofs-num_boundary_fofs) f=add_new_fof();
       fofs[f].particles = root_p + i;
       last_sf = sf;
     }
   }
-  if (f>-1) { 
+  if (f>-1) {
     fofs[f].num_p = (root_p + i) - fofs[f].particles;
-    if (fofs[f].num_p < MIN_HALO_PARTICLES && 
-	(sf < num_smallfofs-num_boundary_fofs)) num_fofs--;
+    if (fofs[f].num_p < MIN_HALO_PARTICLES &&
+        (sf < num_smallfofs-num_boundary_fofs)) num_fofs--;
   }
   num_smallfofs = 0;
 }
@@ -194,7 +194,7 @@ struct fof *return_fullfofs(int64_t *num_f, int64_t *num_bf) {
   num_smallfofs = num_alloced_smallfofs = 0;
   smallfofs = check_realloc(smallfofs, 0, "Freeing SmallFOFs.");
   particle_smallfofs = check_realloc(particle_smallfofs, 0,
-				     "Freeing particle smallfofs.");
+                                     "Freeing particle smallfofs.");
   num_alloced_particles = 0;
   f_all_fofs = fofs;
   *num_f = num_fofs;
@@ -209,7 +209,7 @@ void copy_fullfofs(struct fof **base, int64_t *num_f, int64_t *num_alloced_f)
 {
   if ((*num_f)+num_fofs > (*num_alloced_f)) {
     *base = check_realloc(*base, sizeof(struct fof)*((*num_f)+num_fofs+1000),
-			  "Allocating copy space for FOFs.");
+                          "Allocating copy space for FOFs.");
     *num_alloced_f = (*num_f)+num_fofs+1000;
   }
   memcpy((*base)+(*num_f), fofs, sizeof(struct fof)*num_fofs);

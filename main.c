@@ -46,7 +46,7 @@ int main(int argc, char **argv)
     if (!strcmp("-s", argv[i])) { snap = atoi(argv[i+1]); i++; }
   }
   if (!did_config) do_config(NULL);
-  if (strlen(SNAPSHOT_NAMES)) 
+  if (strlen(SNAPSHOT_NAMES))
     read_input_names(SNAPSHOT_NAMES, &snapnames, &NUM_SNAPS);
   if (strlen(BLOCK_NAMES))
     read_input_names(BLOCK_NAMES, &blocknames, &NUM_BLOCKS);
@@ -55,26 +55,26 @@ int main(int argc, char **argv)
     for (i=1; i<argc; i++) {
       if (!strcmp("-c", argv[i])) i++;
       else if (!strcmp("-s", argv[i])) {
-	snap = argv[i+1] ? atoi(argv[i+1]) : 0;
-	i++;
+        snap = argv[i+1] ? atoi(argv[i+1]) : 0;
+        i++;
       }
       else if (!strcmp("-b", argv[i])) {
-	block = argv[i+1] ? atoi(argv[i+1]) : 0;
-	i++;
+        block = argv[i+1] ? atoi(argv[i+1]) : 0;
+        i++;
       }
       else read_particles(argv[i]);
     }
 
     if (snap >= 0) {
       if (block < 0) {
-	for (block=0; block<NUM_BLOCKS; block++) {
-	  get_input_filename(buffer, 1024, snap, block);
-	  read_particles(buffer);
-	}
+        for (block=0; block<NUM_BLOCKS; block++) {
+          get_input_filename(buffer, 1024, snap, block);
+          read_particles(buffer);
+        }
       }
       else {
-	get_input_filename(buffer, 1024, snap, block);
-	read_particles(buffer);
+        get_input_filename(buffer, 1024, snap, block);
+        read_particles(buffer);
       }
     }
 

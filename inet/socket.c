@@ -65,14 +65,14 @@ struct addrinfo *default_addrinfo(char *host, char *port) {
   struct addrinfo hints = {0};
   struct addrinfo *res = NULL;
   int status;
-  
+
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_family = AF_UNSPEC;
   hints.ai_flags = (host) ? 0 : AI_PASSIVE;
 
   if (!(status = getaddrinfo(host, port, &hints, &res))) return res;
-  fprintf(stderr, "[Error] Couldn't open %s:%s!  (Err: %s)\n", 
-	  host, port, gai_strerror(status));
+  fprintf(stderr, "[Error] Couldn't open %s:%s!  (Err: %s)\n",
+          host, port, gai_strerror(status));
   exit(1);
 }
 
@@ -90,7 +90,7 @@ int _connect_to_addr(char *host, char *port) {
   s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
   if (s < 0) {
     fprintf(stderr, "[Error] Couldn't open socket for address %s:%s!  (Err: %s)\n",
-	    host, port, strerror(errno));
+            host, port, strerror(errno));
     exit(1);
   }
 
@@ -103,7 +103,7 @@ int _connect_to_addr(char *host, char *port) {
   }
   if (i==RETRIES) {
     fprintf(stderr, "[Error] Failed to connect to %s:%s! (Err: %s;\n",
-    	    host, port, strerror(errno));
+                host, port, strerror(errno));
     fprintf(stderr, " This error may mean that the connection was refused.)\n");
     exit(1);
   }
@@ -125,8 +125,8 @@ int _listen_at_addr(char *host, char *port) {
   for (i=0; i<RETRIES; i++)
     if (!bind(s, res->ai_addr, res->ai_addrlen)) break;
 
-  if (i<RETRIES) 
-    for (i=0; i<RETRIES; i++) 
+  if (i<RETRIES)
+    for (i=0; i<RETRIES; i++)
       if (!listen(s, SOMAXCONN)) break;
   if (i==RETRIES) {
     close(s);

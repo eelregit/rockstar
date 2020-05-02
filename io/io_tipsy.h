@@ -63,16 +63,16 @@ struct tipsy_nc_dump {
 } ;
 
 enum tipsy_DataTypeCode {
-	int8 = 1,
-	uint8,
-	int16,
-	uint16,
-	int32,
-	uint32,
-	int64,
-	uint64,
-	float32,
-	float64
+        int8 = 1,
+        uint8,
+        int16,
+        uint16,
+        int32,
+        uint32,
+        int64,
+        uint64,
+        float32,
+        float64
 };
 
 void load_particles_tipsy(char *filename, struct particle **p, int64_t *num_p);

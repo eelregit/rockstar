@@ -95,7 +95,7 @@ struct bgroup *find_bgroup_from_id(int64_t id, int64_t chunk) {
   if (!(chunk == bg[gid].chunk && id == bg[gid].id)) {
     fprintf(stderr, "Huh? Asked for chunk %"PRId64" and id %"PRId64", and got %"PRId64", %"PRId64" (uid=%"PRId64") with %"PRId64" particles (max_gid=%"PRId64"; uid=%"PRId64"; num_elems=%"PRId64")\n", chunk, id, bg[gid].chunk, bg[gid].id, bg[gid].chunk*max_gid + bg[gid].id, bg[gid].num_p, max_gid, uid, bg_ih->elems);
     fprintf(stderr, "PID: %d\n", getpid());
-    sleep(100);    
+    sleep(100);
     assert(0);
   }
   return (bg+gid);
@@ -107,7 +107,7 @@ void verify_bgroup_hash(void) {
     if (bg_ih->buckets[i].key != IH_INVALID) {
       struct bgroup *tbg = bg + ((int64_t)bg_ih->buckets[i].data)-1;
       if ((tbg->chunk*max_gid + tbg->id) != bg_ih->buckets[i].key) {
-	fprintf(stderr, "Error in bucket %"PRId64"!\n", i);
+        fprintf(stderr, "Error in bucket %"PRId64"!\n", i);
       }
     }
   }
@@ -142,7 +142,7 @@ void mark_bgroup_tree(void) {
     if (nodes[i].flags & FAST3TREE_MARKED) continue;
     for (j=1; j<nodes[i].num_points; j++)
       if (nodes[i].points[j].bgid != nodes[i].points[0].bgid ||
-	  nodes[i].points[j].chunk != nodes[i].points[0].chunk) break;
+          nodes[i].points[j].chunk != nodes[i].points[0].chunk) break;
     if (j==nodes[i].num_points) _fast3tree_mark_node(nodes+i, FAST3TREE_MARKED);
   }
 }
@@ -201,11 +201,11 @@ void check_bgroup_sanity(int64_t num_sets, int64_t *set_sizes, struct bgroup *gr
 void find_bgroup_sets(int64_t chunk, int64_t *num_sets, int64_t **set_sizes, struct bgroup **groups, int64_t *total_groups) {
   int64_t i, j, loc=0, new_total_size = 0;
   int64_t *new_set_sizes = check_realloc(NULL, (*num_sets)*sizeof(int64_t),
-					 "New set sizes");
+                                         "New set sizes");
   int64_t *set_new_index = check_realloc(NULL, (*num_sets)*sizeof(int64_t),
-				      "Num in set");
+                                      "Num in set");
   int64_t *num_new_bgroups = check_realloc(NULL, (*num_sets)*sizeof(int64_t),
-					   "Num in set");
+                                           "Num in set");
 
   //Step 1: Link together groups which are in the same request set
   for (i=0; i<*num_sets; i++) {
@@ -215,28 +215,28 @@ void find_bgroup_sets(int64_t chunk, int64_t *num_sets, int64_t **set_sizes, str
     for (j=loc; j<loc+set_sizes[0][i]; j++) {
       g1 = find_bgroup_from_id(groups[0][j].id, groups[0][j].chunk);
       if (g1) {
-	if (groups[0][j].num_p) {
-	  assert(!(g1->num_p) || (g1->num_p == groups[0][j].num_p));
-	  g1->num_p = groups[0][j].num_p;
-	}
-	struct bgroup temp = groups[0][j];
-	groups[0][j] = groups[0][loc];
-	groups[0][loc] = temp;
-	bg[g1->head].tagged = -1;
-	j++;
-	break;
+        if (groups[0][j].num_p) {
+          assert(!(g1->num_p) || (g1->num_p == groups[0][j].num_p));
+          g1->num_p = groups[0][j].num_p;
+        }
+        struct bgroup temp = groups[0][j];
+        groups[0][j] = groups[0][loc];
+        groups[0][loc] = temp;
+        bg[g1->head].tagged = -1;
+        j++;
+        break;
       } else { num_new_bgroups[i]++; }
     }
 
     for (; j<loc+set_sizes[0][i]; j++) {
       struct bgroup *g2 = find_bgroup_from_id(groups[0][j].id, groups[0][j].chunk);
       if (g2) {
-	bg[g2->head].tagged = -1;
-	link_bgroups(g1-bg, g2-bg);
-	if (groups[0][j].num_p) {
-	  assert(!(g2->num_p) || (g2->num_p == groups[0][j].num_p));
-	  g2->num_p = groups[0][j].num_p;
-	}
+        bg[g2->head].tagged = -1;
+        link_bgroups(g1-bg, g2-bg);
+        if (groups[0][j].num_p) {
+          assert(!(g2->num_p) || (g2->num_p == groups[0][j].num_p));
+          g2->num_p = groups[0][j].num_p;
+        }
       }
       else { num_new_bgroups[i]++; }
     }
@@ -258,8 +258,8 @@ void find_bgroup_sets(int64_t chunk, int64_t *num_sets, int64_t **set_sizes, str
     if (bg[g1->head].chunk < chunk) {
       int64_t gid = g1->head;
       while (gid > -1) {
-	if (bg[gid].chunk != our_chunk) bg[gid].num_p = 0;
-	gid = bg[gid].next;
+        if (bg[gid].chunk != our_chunk) bg[gid].num_p = 0;
+        gid = bg[gid].next;
       }
       continue;
     }
@@ -269,8 +269,8 @@ void find_bgroup_sets(int64_t chunk, int64_t *num_sets, int64_t **set_sizes, str
       new_set_sizes[i] += num_new_bgroups[i];
       int64_t gid = g1->head;
       while (gid > -1) {
-	new_set_sizes[i]++;
-	gid = bg[gid].next;
+        new_set_sizes[i]++;
+        gid = bg[gid].next;
       }
     } else {
       new_set_sizes[bg[g1->head].tagged] += num_new_bgroups[i];
@@ -290,7 +290,7 @@ void find_bgroup_sets(int64_t chunk, int64_t *num_sets, int64_t **set_sizes, str
     struct bgroup *g1 = find_bgroup_from_id(groups[0][j].id, groups[0][j].chunk);
     if (!g1) { //Copy all groups over
       for (int64_t k=0; k<set_sizes[0][i]; k++)
-	new_bgroups[set_new_index[i]+k] = groups[0][j+k];
+        new_bgroups[set_new_index[i]+k] = groups[0][j+k];
       j += set_sizes[0][i];
       continue;
     }
@@ -304,10 +304,10 @@ void find_bgroup_sets(int64_t chunk, int64_t *num_sets, int64_t **set_sizes, str
     if (tagged == i) { //Copy all linked groups over
       int64_t gid = g1->head;
       while (gid > -1) {
-	new_bgroups[set_new_index[i]] = bg[gid];
-	if (bg[gid].chunk != our_chunk) bg[gid].num_p = 0;
-	set_new_index[i]++;
-	gid = bg[gid].next;
+        new_bgroups[set_new_index[i]] = bg[gid];
+        if (bg[gid].chunk != our_chunk) bg[gid].num_p = 0;
+        set_new_index[i]++;
+        gid = bg[gid].next;
       }
     }
     //Copy all nonlinked groups over
@@ -315,8 +315,8 @@ void find_bgroup_sets(int64_t chunk, int64_t *num_sets, int64_t **set_sizes, str
     for (; j<loc+set_sizes[0][i]; j++) {
       struct bgroup *g2 = find_bgroup_from_id(groups[0][j].id, groups[0][j].chunk);
       if (!g2) {
-	new_bgroups[set_new_index[tagged]] = groups[0][j];
-	set_new_index[tagged]++;
+        new_bgroups[set_new_index[tagged]] = groups[0][j];
+        set_new_index[tagged]++;
       }
     }
   }
@@ -353,8 +353,8 @@ void bgroups_to_setlist(void) {
     if (bg[i].chunk < our_chunk) {
       j=i;
       while (j>-1) {
-	total_num_groups--;
-	j = bg[j].next;
+        total_num_groups--;
+        j = bg[j].next;
       }
       continue;
     }
@@ -362,7 +362,7 @@ void bgroups_to_setlist(void) {
   }
 
   bg_set_sizes = check_realloc(bg_set_sizes, sizeof(int64_t)*(num_bg_sets),
-			     "Allocating set sizes.");
+                             "Allocating set sizes.");
   final_bg = check_realloc(final_bg, sizeof(struct bgroup)*(total_num_groups), "Allocating bgroup lists.");
 
   //Fill group list and set sizes
@@ -388,7 +388,7 @@ void bgroups_to_setlist(void) {
 int64_t prune_setlist(void) {
   int64_t i,j=0,k=0,loc,num_p_in_set, set_num = 0;
   for (i=0; i<num_bg_sets; i++) {
-    loc = j; 
+    loc = j;
     num_p_in_set = 0;
     for (; j<loc+bg_set_sizes[i]; j++)
       num_p_in_set += final_bg[j].num_p;
@@ -405,7 +405,7 @@ int64_t calc_next_bgroup_chunk(void) {
   int64_t i, total_bg=0, max_chunk = 0, total_num_p = 0;
   if (!num_new_groups)
     num_new_groups = check_realloc(NULL, sizeof(int64_t)*NUM_WRITERS,
-				   "Allocating new group counts.");
+                                   "Allocating new group counts.");
   memset(num_new_groups, 0, sizeof(int64_t)*NUM_WRITERS);
   for (i=0; i<num_bg_sets; i++) total_bg += bg_set_sizes[i];
   for (i=0; i<total_bg; i++) {
@@ -462,12 +462,12 @@ void sort_out_halos_for_chunk(int64_t chunk, float *bounds, struct workunit_info
 
   w->num_halos = c_num_h;
   int64_t *index_conversion = check_realloc(NULL, num_halos*sizeof(int64_t),
-					    "Halo index conversion");
+                                            "Halo index conversion");
   *c_p = check_realloc(NULL, sizeof(struct particle)*(c_num_p + c_num_meta_p),
-		       "chunk particles");
+                       "chunk particles");
   *c_halos = check_realloc(NULL, sizeof(struct halo)*(c_num_h), "chunk halos");
   *c_ei = check_realloc(NULL, sizeof(struct extra_halo_info)*(c_num_h),
-			"chunk info");
+                        "chunk info");
 
   int64_t j = 0, processed_parts = 0, processed_meta_parts = w->num_particles;
   w->num_particles = c_meta_loc = c_num_p;
@@ -485,34 +485,34 @@ void sort_out_halos_for_chunk(int64_t chunk, float *bounds, struct workunit_info
     }
     int64_t p_end = *p_start + fofs[i].num_p;
     for (; j<num_halos && (halos[j].p_start+halos[j].num_p<=p_end) &&
-	   (halos[j].p_start >= *p_start); j++) {
+           (halos[j].p_start >= *p_start); j++) {
       if ((halos[j].flags & TAGGED_FLAG)) {
-	if (halos[j].num_p == 0 && halos[j].p_start == p_end) {
-	  int64_t sub_of = extra_info[j].sub_of;
-	  while (sub_of > -1 && extra_info[sub_of].sub_of > -1)
-	    sub_of = extra_info[sub_of].sub_of;
-	  if (sub_of > -1 && halos[sub_of].p_start+halos[sub_of].num_p > p_end)
-	    break;
-	}
-	c_halos[0][cur_h] = halos[j];
-	c_halos[0][cur_h].p_start = *copy_loc;
-	c_ei[0][cur_h] = extra_info[j];
-	index_conversion[j] = cur_h;
-	cur_h++;
-	num_h_from_fof++;
-	if (halos[j].num_p) {
-	  num_p_from_fof += halos[j].num_p;
-	  memcpy((*c_p)+*copy_loc, p+halos[j].p_start, halos[j].num_p*sizeof(struct particle));
-	  copy_loc[0] += halos[j].num_p;
-	}
+        if (halos[j].num_p == 0 && halos[j].p_start == p_end) {
+          int64_t sub_of = extra_info[j].sub_of;
+          while (sub_of > -1 && extra_info[sub_of].sub_of > -1)
+            sub_of = extra_info[sub_of].sub_of;
+          if (sub_of > -1 && halos[sub_of].p_start+halos[sub_of].num_p > p_end)
+            break;
+        }
+        c_halos[0][cur_h] = halos[j];
+        c_halos[0][cur_h].p_start = *copy_loc;
+        c_ei[0][cur_h] = extra_info[j];
+        index_conversion[j] = cur_h;
+        cur_h++;
+        num_h_from_fof++;
+        if (halos[j].num_p) {
+          num_p_from_fof += halos[j].num_p;
+          memcpy((*c_p)+*copy_loc, p+halos[j].p_start, halos[j].num_p*sizeof(struct particle));
+          copy_loc[0] += halos[j].num_p;
+        }
       }
     }
     p_start[0] += fofs[i].num_p;
     if (num_h_from_fof && !(num_p_from_fof)) cur_h -= num_h_from_fof;
     if (num_p_from_fof) {
       if (!(c_num_fofs%1000))
-	*c_fofs = check_realloc(*c_fofs, sizeof(struct fof)*(c_num_fofs+1000),
-				"chunk fofs");
+        *c_fofs = check_realloc(*c_fofs, sizeof(struct fof)*(c_num_fofs+1000),
+                                "chunk fofs");
       c_fofs[0][c_num_fofs] = fofs[i];
       assert((!fofs[i].particles) || (fofs[i].num_p == num_p_from_fof));
       c_fofs[0][c_num_fofs].num_p = num_p_from_fof;

@@ -5,8 +5,8 @@
 // Recursive auxiliary function for adaptiveSimpsons() function below
 //
 double adaptiveSimpsonsAux(double (*f)(double, void *), void *extra_data,
-			  double a, double b, double epsilon,
-			  double S, double fa, double fb, double fc, int bottom) {
+                          double a, double b, double epsilon,
+                          double S, double fa, double fb, double fc, int bottom) {
   double c = (a + b)/2, h = b - a;
   double d = (a + c)/2, e = (c + b)/2;
   double fd = f(d, extra_data), fe = f(e, extra_data);
@@ -23,7 +23,7 @@ double adaptiveSimpsonsAux(double (*f)(double, void *), void *extra_data,
 // Adaptive Simpson's Rule
 //
 double adaptiveSimpsons(double (*f)(double, void*),   // ptr to function
-		       void *extra_data,
+                       void *extra_data,
                            double a, double b,  // interval [a,b]
                            double epsilon,  // error tolerance
                            int maxRecursionDepth) {   // recursion cap

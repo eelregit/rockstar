@@ -45,7 +45,7 @@ void load_particles_tipsy(char *filename, struct particle **p, int64_t *num_p) {
   check_realloc_s(*p, (*num_p) + header.ndark, sizeof(struct particle));
 #else
   check_realloc_s((*p), ((*num_p) + header.ndark+header.nsph+header.nstar),
-		  sizeof(struct particle));
+                  sizeof(struct particle));
 #endif
 
   haveiords = load_ids_tipsy(filename,header,&iords,&num_iords);
@@ -59,13 +59,13 @@ void load_particles_tipsy(char *filename, struct particle **p, int64_t *num_p) {
       if (xdrfmt) assert(tipsy_xdr_gas(&xdrs, &gas) > 0);
       else fread((char *)&gas,sizeof(struct tipsy_gas_particle), 1, input) ;
       for (j=0; j<3; j++) {
-	if (haveiords) (*p)[i+(*num_p)].id = iords[i];
-	else (*p)[i+(*num_p)].id = i;
-	(*p)[i+(*num_p)].pos[j] = (gas.pos[j] + 0.5) * TIPSY_LENGTH_CONVERSION;
-	(*p)[i+(*num_p)].pos[j+3] = gas.vel[j] * TIPSY_VELOCITY_CONVERSION * SCALE_NOW;
-	  }
+        if (haveiords) (*p)[i+(*num_p)].id = iords[i];
+        else (*p)[i+(*num_p)].id = i;
+        (*p)[i+(*num_p)].pos[j] = (gas.pos[j] + 0.5) * TIPSY_LENGTH_CONVERSION;
+        (*p)[i+(*num_p)].pos[j+3] = gas.vel[j] * TIPSY_VELOCITY_CONVERSION * SCALE_NOW;
+          }
       }
-  (*num_p) += header.nsph;  
+  (*num_p) += header.nsph;
 #else
   if (!xdrfmt) {
     fseek(input, sizeof(struct tipsy_gas_particle)*header.nsph, SEEK_CUR);
@@ -83,15 +83,15 @@ void load_particles_tipsy(char *filename, struct particle **p, int64_t *num_p) {
       if (haveiords) (*p)[i+(*num_p)].id = iords[ip];
       else (*p)[i+(*num_p)].id = ip;
       for (j=0; j<3; j++) {
-	(*p)[i+(*num_p)].pos[j] = (dark.pos[j] + 0.5) * TIPSY_LENGTH_CONVERSION;
-	(*p)[i+(*num_p)].pos[j+3] = dark.vel[j] * TIPSY_VELOCITY_CONVERSION * SCALE_NOW;
-	  /*
-	  if (haveiords) (*p)[ip].id = iords[ip];
-	  else (*p)[ip].id = ip;
-	  (*p)[ip].pos[j] = (dark.pos[j] + 0.5) * TIPSY_LENGTH_CONVERSION;
-	  (*p)[ip].pos[j+3] = dark.vel[j] * TIPSY_VELOCITY_CONVERSION;
-	  */
-	  }
+        (*p)[i+(*num_p)].pos[j] = (dark.pos[j] + 0.5) * TIPSY_LENGTH_CONVERSION;
+        (*p)[i+(*num_p)].pos[j+3] = dark.vel[j] * TIPSY_VELOCITY_CONVERSION * SCALE_NOW;
+          /*
+          if (haveiords) (*p)[ip].id = iords[ip];
+          else (*p)[ip].id = ip;
+          (*p)[ip].pos[j] = (dark.pos[j] + 0.5) * TIPSY_LENGTH_CONVERSION;
+          (*p)[ip].pos[j+3] = dark.vel[j] * TIPSY_VELOCITY_CONVERSION;
+          */
+          }
       }
 
   //printf("Read %d dark matter particles.\n",header.ndark);
@@ -104,10 +104,10 @@ void load_particles_tipsy(char *filename, struct particle **p, int64_t *num_p) {
       if (xdrfmt) assert(tipsy_xdr_star(&xdrs, &star) > 0);
       else fread((char *)&star,sizeof(struct tipsy_star_particle), 1, input);
       for (j=0; j<3; j++) {
-	if (haveiords) (*p)[i+(*num_p)].id = iords[ip];
-	else (*p)[i+(*num_p)].id = ip;
-	(*p)[i+(*num_p)].pos[j] = (star.pos[j] + 0.5) * TIPSY_LENGTH_CONVERSION;
-	(*p)[i+(*num_p)].pos[j+3] = star.vel[j] * TIPSY_VELOCITY_CONVERSION * SCALE_NOW;
+        if (haveiords) (*p)[i+(*num_p)].id = iords[ip];
+        else (*p)[i+(*num_p)].id = ip;
+        (*p)[i+(*num_p)].pos[j] = (star.pos[j] + 0.5) * TIPSY_LENGTH_CONVERSION;
+        (*p)[i+(*num_p)].pos[j+3] = star.vel[j] * TIPSY_VELOCITY_CONVERSION * SCALE_NOW;
       }
   }
   (*num_p) += header.nstar;
@@ -121,7 +121,7 @@ void load_particles_tipsy(char *filename, struct particle **p, int64_t *num_p) {
 /* open iord file for ids */
 int load_ids_tipsy(char *filename, struct tipsy_dump header, int **iords, int *num_iords) {
   FILE *iordf;
-  XDR xdrs;  
+  XDR xdrs;
   char iofilename[256];
   int i, nbodies=0, count=0, bStandard = 0, bASCII=0;
   sprintf(iofilename,"%s.iord",filename);
@@ -129,42 +129,42 @@ int load_ids_tipsy(char *filename, struct tipsy_dump header, int **iords, int *n
   if (iordf != NULL) {
       count=fscanf(iordf, "%d%*[, \t]%*d%*[, \t]%*d",&nbodies) ;
       if ( (count == EOF) || (count==0) ){
-	  /* try binary instead */
-	  rewind(iordf);
-	  count=fread(&nbodies, sizeof(int), 1, iordf) ;
+          /* try binary instead */
+          rewind(iordf);
+          count=fread(&nbodies, sizeof(int), 1, iordf) ;
 
-	  if ( (count == EOF) || (count==0) ){
-	      printf("<%s format is wrong>\n",iofilename);
-	      fclose(iordf);
-	      return 0;
-	      } else if(nbodies <= 0 || nbodies > 10000000){
-	      fseek(iordf,0,SEEK_SET);
-	      xdrstdio_create(&xdrs,iordf,XDR_DECODE);
-	      xdr_int(&xdrs,&nbodies);
-	      if (nbodies <= 0 || nbodies > 10000000) {
-		  printf("<%s doesn't appear standard or binary or nbodies > 10 mil.>\n",iofilename);
-		  xdr_destroy(&xdrs);
-		  fclose(iordf);
-		  return 0;
-		  } else bStandard = 1;
-	      }
-	  } else bASCII = 1;
+          if ( (count == EOF) || (count==0) ){
+              printf("<%s format is wrong>\n",iofilename);
+              fclose(iordf);
+              return 0;
+              } else if(nbodies <= 0 || nbodies > 10000000){
+              fseek(iordf,0,SEEK_SET);
+              xdrstdio_create(&xdrs,iordf,XDR_DECODE);
+              xdr_int(&xdrs,&nbodies);
+              if (nbodies <= 0 || nbodies > 10000000) {
+                  printf("<%s doesn't appear standard or binary or nbodies > 10 mil.>\n",iofilename);
+                  xdr_destroy(&xdrs);
+                  fclose(iordf);
+                  return 0;
+                  } else bStandard = 1;
+              }
+          } else bASCII = 1;
 
       check_realloc_s(*iords, sizeof(**iords), nbodies);
       for(i = 0, count = 0; i < nbodies; i++) {
-	int idummy, check=0;
-	if (bStandard) check = xdr_int(&xdrs,&idummy);
-	else if (bASCII) check = (fscanf(iordf, "%d", &idummy)<1) ? EOF : 0;
-	else check = check_fread(&idummy, sizeof(int), 1, iordf) ;
-	(*iords)[count] = idummy;
+        int idummy, check=0;
+        if (bStandard) check = xdr_int(&xdrs,&idummy);
+        else if (bASCII) check = (fscanf(iordf, "%d", &idummy)<1) ? EOF : 0;
+        else check = check_fread(&idummy, sizeof(int), 1, iordf) ;
+        (*iords)[count] = idummy;
 
-	if (check == EOF) {
-	  printf("<%s format is wrong>\n",iofilename);
-	  free(*iords) ;
-	  *iords = NULL;
-	  break;
-	}
-	count++;
+        if (check == EOF) {
+          printf("<%s format is wrong>\n",iofilename);
+          free(*iords) ;
+          *iords = NULL;
+          break;
+        }
+        count++;
       }
       fclose(iordf);
   }
@@ -185,7 +185,7 @@ int load_ids_tipsy(char *filename, struct tipsy_dump header, int **iords, int *n
 
 int tipsy_xdr_header(XDR *pxdrs,struct tipsy_dump *ph) {
     int pad = 0;
-    
+
     if (!xdr_double(pxdrs,&ph->time)) return 0;
     if (!xdr_int(pxdrs,&ph->nbodies)) return 0;
     if (!xdr_int(pxdrs,&ph->ndim)) return 0;
@@ -196,7 +196,7 @@ int tipsy_xdr_header(XDR *pxdrs,struct tipsy_dump *ph) {
     return 1;
     }
 
-int tipsy_xdr_gas(XDR *pxdrs,struct tipsy_gas_particle *ph) { 
+int tipsy_xdr_gas(XDR *pxdrs,struct tipsy_gas_particle *ph) {
     int i;
     if (!xdr_float(pxdrs,&ph->mass)) return 0;
     for(i=0; i<TIPSY_MAXDIM; i++) if (!xdr_float(pxdrs,&ph->pos[i])) return 0;

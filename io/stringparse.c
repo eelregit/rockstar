@@ -41,7 +41,7 @@ static inline int strtowhatever(char *cur_pos, char **end_pos, void *data, enum 
     if (cur_pos == *end_pos) return 0;
     *((int64_t *)data) = vali64;
     return 1;
-   
+
   case PARSE_STRING:
     while (*new_pos && !(*new_pos==' ' || *new_pos=='\t' || *new_pos=='\n')) {
       *data_pos = *new_pos;
@@ -118,12 +118,12 @@ int main(void) {
   printf("%.10e\n", strtof("-0.123456789", NULL));
   printf("%.10e\n", strtofloat("-0.123456789", NULL));
   printf("%d\n", strtoint32("5002342", NULL));
-  printf("%d\n", strtoint32("-3234.8345e10", NULL)); 
-  printf("%ld\n", strtol("-3234.8345e10", NULL, 10)); 
+  printf("%d\n", strtoint32("-3234.8345e10", NULL));
+  printf("%ld\n", strtol("-3234.8345e10", NULL, 10));
   sscanf("-3234.2345e10", "%d", &d2);
-  printf("%d\n", d2); 
+  printf("%d\n", d2);
 
-  
+
   for (i=0; i<1e7; i++) {
     d += strtoint64("100.2341234", NULL);//, NULL, 10);
   }

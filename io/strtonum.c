@@ -8,7 +8,7 @@
 #ifdef CONV_64BIT
 
 #define FLOAT_TYPE double
-#define FLOAT_LONGER_TYPE long double 
+#define FLOAT_LONGER_TYPE long double
 #define FLOAT_MAX DBL_MAX
 #define FLOAT_EXPS DBL_MAX_10_EXP
 #define FLOAT_CONV_NAME strtodouble
@@ -17,7 +17,7 @@
 #define IMIN INT64_MIN
 #define ICONV_NAME strtoint64
 
-#else 
+#else
 
 #define FLOAT_TYPE float
 #define FLOAT_MAX FLT_MAX
@@ -63,9 +63,9 @@ static inline FLOAT_TYPE FLOAT_CONV_NAME (const char *cur_pos, char **end_pos)
     c = *pos;
     if ((c > zerom1) && (c < ninep1)) {
       if (val < toobig)
-	val = val*10.0 + (c-zero);
+        val = val*10.0 + (c-zero);
       else
-	e++;
+        e++;
     }
     else if (c == '.') {
       if (seenexp) break;
@@ -86,13 +86,13 @@ static inline FLOAT_TYPE FLOAT_CONV_NAME (const char *cur_pos, char **end_pos)
       if (!seenexp || seenexpsign  || ((pos - periodendpos)>1)) break;
       seenexpsign = -1;
     }
-    else if ((c=='n' || c=='N') && !strncasecmp(pos,"nan",3) && 
-	     (pos[3]==0 || pos[3]==' ' || pos[3]=='\t' || pos[3]=='\n')) {
+    else if ((c=='n' || c=='N') && !strncasecmp(pos,"nan",3) &&
+             (pos[3]==0 || pos[3]==' ' || pos[3]=='\t' || pos[3]=='\n')) {
       if (end_pos) *end_pos = ((char *)pos)+3;
       return 0;
     }
     else if ((c=='i' || c=='I') && !strncasecmp(pos,"inf",3) &&
-	     (pos[3]==0 || pos[3]==' ' || pos[3]=='\t' || pos[3]=='\n')) {
+             (pos[3]==0 || pos[3]==' ' || pos[3]=='\t' || pos[3]=='\n')) {
       if (end_pos) *end_pos = ((char *)pos)+3;
       return copysign(FLOAT_MAX,sign);
     }
@@ -109,7 +109,7 @@ static inline FLOAT_TYPE FLOAT_CONV_NAME (const char *cur_pos, char **end_pos)
 
   if (periodpos) {
     if (!periodendpos) periodendpos = pos;
-    e -= periodendpos - periodpos - 1;  
+    e -= periodendpos - periodpos - 1;
   }
 
   if (savedval==0) return copysign(0, sign);
@@ -120,7 +120,7 @@ static inline FLOAT_TYPE FLOAT_CONV_NAME (const char *cur_pos, char **end_pos)
   }
   else if (e < -(FLOAT_EXPS*2))
     return copysign(0,sign);
-  
+
   return (copysign(savedval*exps[e+(FLOAT_EXPS*2)], sign));
 }
 
@@ -144,9 +144,9 @@ static inline ITYPE ICONV_NAME (const char *cur_pos, char **end_pos)
     c = *pos;
     if ((c > zerom1) && (c < ninep1)) {
       if (val < toobig)
-	val = val*10 + (c-zero);
+        val = val*10 + (c-zero);
       else
-	toobig_flag = 1;
+        toobig_flag = 1;
     }
     else if (c == '.') {
       seen_period = 1;
@@ -167,14 +167,14 @@ static inline ITYPE ICONV_NAME (const char *cur_pos, char **end_pos)
       c = *pos;
       if ((c > zerom1) && (c < ninep1)) continue;
       if (c == 'e' || c == 'E') {
-	if (seen_exp) break;
-	seen_exp = 1;
-	exppos = pos;
-	continue;
+        if (seen_exp) break;
+        seen_exp = 1;
+        exppos = pos;
+        continue;
       }
       if (c == '+' || c == '-') {
-	if (!seen_exp || (pos - exppos)>1) break;
-	continue;
+        if (!seen_exp || (pos - exppos)>1) break;
+        continue;
       }
       break;
     }

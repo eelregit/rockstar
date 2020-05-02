@@ -110,7 +110,7 @@ void calc_scale_radius(struct halo *h, float mvir, float rvir, float vmax, float
   }
   if (analyze_p < MIN_SCALE_PART) { h->rs = rs; return; }
   ppbin = ceil(((double)analyze_p/(double)MAX_SCALE_BINS));
-  if (ppbin < MIN_PART_PER_BIN) 
+  if (ppbin < MIN_PART_PER_BIN)
     ppbin = (analyze_p) / ((int64_t)(analyze_p/MIN_PART_PER_BIN));
   bin_r[0] = 0;
   for (i=0,j=0; i<total_p-1; i++) {
@@ -122,7 +122,7 @@ void calc_scale_radius(struct halo *h, float mvir, float rvir, float vmax, float
       j=0;
     }
   }
-  
+
   for (i=0; i<num_bins; i++)
     if (bin_r[i]*1e-3 < 3*FORCE_RES) weights[i] = 0.1;
 

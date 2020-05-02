@@ -25,13 +25,13 @@ void load_particles(char *filename, struct particle **p, int64_t *num_p) {
   struct particle d = {0};
   SHORT_PARSETYPE;
 #define NUM_INPUTS 7
-  enum short_parsetype stypes[NUM_INPUTS] = 
+  enum short_parsetype stypes[NUM_INPUTS] =
     { F, F, F, F, F, F, D64};
   enum parsetype types[NUM_INPUTS];
   void *data[NUM_INPUTS] = {&(d.pos[0]), &(d.pos[1]), &(d.pos[2]), &(d.pos[3]), &(d.pos[4]), &(d.pos[5]), &(d.id)};
 
   for (n=0; n<NUM_INPUTS; n++) types[n] = (enum parsetype)stypes[n];
-  
+
   input = check_fopen(filename, "r");
   while (fgets(buffer, 1024, input)) {
     if (buffer[0] == '#') {
@@ -43,7 +43,7 @@ void load_particles(char *filename, struct particle **p, int64_t *num_p) {
     if (n < NUM_INPUTS) continue;
     if (((*num_p)%1000)==0) {
       *p = check_realloc(*p, ((*num_p)+1000)*sizeof(struct particle),
-			 "Adding new particles.");
+                         "Adding new particles.");
     }
     (*p)[(*num_p)] = d;
     (*num_p)++;

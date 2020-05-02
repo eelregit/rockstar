@@ -27,7 +27,7 @@ extern GROUP_DATA_RMPVMAX *gd;
 #undef parent
 
 void load_bgc2_groups(char *filename, struct bgc2_header *hdr,
-		      GROUP_DATA_RMPVMAX **groups, int64_t *num_groups);
+                      GROUP_DATA_RMPVMAX **groups, int64_t *num_groups);
 
 int sort_by_id(const void *a, const void *b) {
   const GROUP_DATA_RMPVMAX *c = a;
@@ -47,9 +47,9 @@ void calc_bgc2_parents(int64_t snap)
   GROUP_DATA_RMPVMAX key, *first_group;
 
   hdrs = check_realloc(hdrs, BGC2_HEADER_SIZE*NUM_WRITERS,
-		       "Allocating BGC2 headers.");
+                       "Allocating BGC2 headers.");
   first_ids = check_realloc(first_ids, sizeof(int64_t)*NUM_WRITERS,
-		       "Allocating IDs.");
+                       "Allocating IDs.");
 
   for (i=0; i<NUM_WRITERS; i++) {
     get_output_filename(buffer, 1024, snap, i, "bgc2");
@@ -87,8 +87,8 @@ void calc_bgc2_parents(int64_t snap)
     get_output_filename(buffer, 1024, snap, i, "bgc2");
     output = fopen(buffer, "r+b");
     fwrite_fortran(hdrs + i, BGC2_HEADER_SIZE, 1, output);
-    fwrite_fortran(first_group, sizeof(GROUP_DATA_RMPVMAX), 
-		   hdrs[i].ngroups, output);
+    fwrite_fortran(first_group, sizeof(GROUP_DATA_RMPVMAX),
+                   hdrs[i].ngroups, output);
     fclose(output);
   }
 

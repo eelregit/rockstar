@@ -23,6 +23,6 @@ struct fof *return_fullfofs(int64_t *num_f, int64_t *num_bf);
 void copy_fullfofs(struct fof **base, int64_t *num_f, int64_t *num_alloced_f);
 
 void partition_sort_particles(int64_t min, int64_t max,
-			      struct particle *particles, int64_t *assignments);
+                              struct particle *particles, int64_t *assignments);
 
 #endif /* FOF_H */

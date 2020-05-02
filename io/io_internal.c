@@ -14,7 +14,7 @@ void *output_buffer = NULL;
 int64_t buffered = 0;
 
 void fill_binary_header(struct binary_output_header *bh,
-			int64_t snap, int64_t chunk) {
+                        int64_t snap, int64_t chunk) {
   bh->magic = ROCKSTAR_MAGIC;
   bh->snap = snap;
   bh->chunk = chunk;
@@ -23,7 +23,7 @@ void fill_binary_header(struct binary_output_header *bh,
   bh->Ol = Ol;
   bh->h0 = h0;
   bh->box_size = BOX_SIZE;
-  bh->particle_mass = PARTICLE_MASS;  
+  bh->particle_mass = PARTICLE_MASS;
   snprintf(bh->rockstar_version, VERSION_MAX_SIZE, "%s", ROCKSTAR_VERSION);
   bh->format_revision = HALO_FORMAT_REVISION;
 }
@@ -43,7 +43,7 @@ void output_particles_internal(int64_t snap, int64_t chunk, double fraction) {
   struct binary_output_header bh;
   FILE *output;
   int64_t i, j;
-  
+
   memset(&bh, 0, sizeof(struct binary_output_header));
   fill_binary_header(&bh, snap, chunk);
   bh.num_particles = num_p;
@@ -59,8 +59,8 @@ void output_particles_internal(int64_t snap, int64_t chunk, double fraction) {
   } else {
     for (i=0,j=0; i<num_p; i++) {
       if (random_unit()<fraction) {
-	check_fwrite(p+i, sizeof(struct particle), 1, output);
-	j++;
+        check_fwrite(p+i, sizeof(struct particle), 1, output);
+        j++;
       }
     }
     bh.num_particles = j;
@@ -75,7 +75,7 @@ void output_particles_internal(int64_t snap, int64_t chunk, double fraction) {
 void load_particles_internal(char *filename, struct particle **part, int64_t *num_part) {
   FILE *input;
   struct binary_output_header bh;
-  
+
   input = check_fopen(filename, "rb");
   check_fread(&bh, sizeof(struct binary_output_header), 1, input);
   assert(bh.magic == ROCKSTAR_MAGIC);
@@ -119,7 +119,7 @@ void output_binary(int64_t id_offset, int64_t snap, int64_t chunk, float *bounds
   _append_to_buffer(&bheader, sizeof(struct binary_output_header), output);
 
   //Output Halos
-  if (num_halos) { 
+  if (num_halos) {
     memcpy(min, halos[0].pos, sizeof(float)*3);
     memcpy(max, halos[0].pos, sizeof(float)*3);
   }
@@ -143,7 +143,7 @@ void output_binary(int64_t id_offset, int64_t snap, int64_t chunk, float *bounds
     for (i=0; i<num_halos; i++) {
       if (!_should_print(halos+i, bounds)) continue;
       for (j=0; j<halos[i].num_p; j++)
-	_append_to_buffer(&(p[halos[i].p_start+j].id), sizeof(int64_t), output);
+        _append_to_buffer(&(p[halos[i].p_start+j].id), sizeof(int64_t), output);
     }
   }
   _clear_buffer(output);
@@ -157,11 +157,11 @@ void output_binary(int64_t id_offset, int64_t snap, int64_t chunk, float *bounds
   }
   rewind(output);
   check_fwrite(&bheader, sizeof(struct binary_output_header), 1, output);
-  fclose(output);  
+  fclose(output);
 }
 
-void load_binary_header(int64_t snap, int64_t chunk, 
-			struct binary_output_header *bheader) {
+void load_binary_header(int64_t snap, int64_t chunk,
+                        struct binary_output_header *bheader) {
   char buffer[1024];
   FILE *input;
   get_output_filename(buffer, 1024, snap, chunk, "bin");
@@ -172,9 +172,9 @@ void load_binary_header(int64_t snap, int64_t chunk,
 }
 
 
-void load_binary_halos(int64_t snap, int64_t chunk, 
+void load_binary_halos(int64_t snap, int64_t chunk,
       struct binary_output_header *bheader, struct halo **halos,
-		       int64_t **part_ids, int64_t coalesced)
+                       int64_t **part_ids, int64_t coalesced)
 {
   char buffer[1024];
   FILE *input;

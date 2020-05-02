@@ -5,7 +5,7 @@
 #include "hubble.h"
 
 /* See http://arxiv.org/pdf/astro-ph/0208512v1.pdf */
-double _weff(double a) 
+double _weff(double a)
 {
   if(a != 1.0)
     return W0 + WA - WA*(a - 1.0)/log(a);
@@ -13,7 +13,7 @@ double _weff(double a)
     return W0;
 }
 
-double hubble_scaling(double z) 
+double hubble_scaling(double z)
 {
   double z1 = 1.0+z;
   double a = 1.0/z1;

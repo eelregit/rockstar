@@ -39,8 +39,8 @@ void convert_bgroups_to_metafofs(void);
 void do_workunit(struct workunit_info *w, struct fof *fofs);
 void find_unfinished_workunit(struct workunit_info *w, struct fof **fofs, struct particle **parts, int64_t **set_sizes, struct bgroup **bgroup_list);
 void integrate_finished_workunit(struct workunit_info *w, struct fof *fofs,
-				 struct halo *h, struct extra_halo_info *ei,
-				 struct particle *parts);
+                                 struct halo *h, struct extra_halo_info *ei,
+                                 struct particle *parts);
 void fof_of_id(int64_t id, struct fof *tf);
 void particle_cleanup();
 

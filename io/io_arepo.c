@@ -36,13 +36,13 @@ void arepo_read_dataset(hid_t HDF_FileID, char *filename, char *gid, char *datai
   hssize_t npoints = H5Sget_select_npoints(HDF_DataspaceID);
 
   if (npoints != to_read*stride) {
-    fprintf(stderr, "[Error] dataspace %s/%s in HDF5 file %s not expected size!\n  (Actual size = %"PRId64" elements; expected size = %"PRId64" elements\n", 
-	    gid, dataid, filename, (int64_t)(npoints), stride*to_read);
+    fprintf(stderr, "[Error] dataspace %s/%s in HDF5 file %s not expected size!\n  (Actual size = %"PRId64" elements; expected size = %"PRId64" elements\n",
+            gid, dataid, filename, (int64_t)(npoints), stride*to_read);
     exit(1);
   }
 
   check_H5Dread(HDF_DatasetID, type, buffer, dataid, gid, filename);
-  
+
   H5Sclose(HDF_DataspaceID);
   H5Dclose(HDF_DatasetID);
   H5Gclose(HDF_GroupID);
@@ -65,7 +65,7 @@ float arepo_readheader_float(hid_t HDF_GroupID, char *filename, char *objName)
   hid_t HDF_DataspaceID = check_H5Aget_space(HDF_AttrID);
 
   check_H5Sselect_all(HDF_DataspaceID);
-  
+
   float data = 0.0;
   check_H5Aread( HDF_AttrID, HDF_Type, &data, objName, gid, filename);
 
@@ -87,7 +87,7 @@ void arepo_readheader_array(hid_t HDF_GroupID, char *filename, char *objName, hi
   hsize_t dimsize = 0;
   check_H5Sget_simple_extent_dims(HDF_DataspaceID, &dimsize);
   assert(dimsize == AREPO_NTYPES);
-  
+
   check_H5Aread(HDF_AttrID, type, data, objName, gid, filename);
 
   H5Sclose(HDF_DataspaceID);
@@ -97,7 +97,7 @@ void arepo_readheader_array(hid_t HDF_GroupID, char *filename, char *objName, hi
 void arepo_rescale_particles(struct particle *p, int64_t p_start, int64_t nelems) {
   double vel_rescale = sqrt(SCALE_NOW);
   if (LIGHTCONE) vel_rescale = 1;
-	
+
   for (int64_t i=0; i<nelems; i++) {
     for (int64_t j=0; j<3; j++) {
       p[p_start+i].pos[j]   *= AREPO_LENGTH_CONVERSION;
@@ -107,37 +107,37 @@ void arepo_rescale_particles(struct particle *p, int64_t p_start, int64_t nelems
 }
 
 void load_particles_arepo(char *filename, struct particle **p, int64_t *num_p)
-{	
+{
   hid_t HDF_FileID = check_H5Fopen(filename, H5F_ACC_RDONLY);
   hid_t HDF_Header = check_H5Gopen(HDF_FileID, "Header", filename);
-  
+
   Ol = arepo_readheader_float(HDF_Header, filename, "OmegaLambda");
   Om = arepo_readheader_float(HDF_Header, filename, "Omega0");
   h0 = arepo_readheader_float(HDF_Header, filename, "HubbleParam");
   SCALE_NOW = arepo_readheader_float(HDF_Header, filename, "Time");
   BOX_SIZE = arepo_readheader_float(HDF_Header, filename, "BoxSize");
-  BOX_SIZE *= AREPO_LENGTH_CONVERSION;  
-  
+  BOX_SIZE *= AREPO_LENGTH_CONVERSION;
+
   uint32_t npart_low[AREPO_NTYPES], npart_high[AREPO_NTYPES] = {0};
   int64_t npart[AREPO_NTYPES];
   float massTable[AREPO_NTYPES];
-  
+
   arepo_readheader_array(HDF_Header, filename, "NumPart_ThisFile", H5T_NATIVE_UINT64, npart);
   arepo_readheader_array(HDF_Header, filename, "NumPart_Total_HighWord", H5T_NATIVE_UINT32, npart_high);
   arepo_readheader_array(HDF_Header, filename, "NumPart_Total", H5T_NATIVE_UINT32, npart_low);
   arepo_readheader_array(HDF_Header, filename, "MassTable", H5T_NATIVE_FLOAT, massTable);
-  
-  TOTAL_PARTICLES = ( ((int64_t)npart_high[AREPO_DM_PARTTYPE]) << 32 ) 
+
+  TOTAL_PARTICLES = ( ((int64_t)npart_high[AREPO_DM_PARTTYPE]) << 32 )
     + (int64_t)npart_low[AREPO_DM_PARTTYPE];
-  
+
   H5Gclose(HDF_Header);
-    
+
   PARTICLE_MASS   = massTable[AREPO_DM_PARTTYPE] * AREPO_MASS_CONVERSION;
   AVG_PARTICLE_SPACING = cbrt(PARTICLE_MASS / (Om*CRITICAL_DENSITY));
-	
+
   if(RESCALE_PARTICLE_MASS)
     PARTICLE_MASS = Om*CRITICAL_DENSITY * pow(BOX_SIZE, 3) / TOTAL_PARTICLES;
- 
+
   printf("AREPO: filename:       %s\n", filename);
   printf("AREPO: box size:       %g Mpc/h\n", BOX_SIZE);
   printf("AREPO: h0:             %g\n", h0);
@@ -146,7 +146,7 @@ void load_particles_arepo(char *filename, struct particle **p, int64_t *num_p)
   printf("AREPO: ThisFile DM Part: %" PRIu64 "\n", npart[AREPO_DM_PARTTYPE]);
   printf("AREPO: DM Part Mass:   %g Msun/h\n", PARTICLE_MASS);
   printf("AREPO: avgPartSpacing: %g Mpc/h\n\n", AVG_PARTICLE_SPACING);
-  
+
   if (!npart[AREPO_DM_PARTTYPE]) {
     H5Fclose(HDF_FileID);
     printf("   SKIPPING FILE, PARTICLE COUNT ZERO.\n");
@@ -160,16 +160,16 @@ void load_particles_arepo(char *filename, struct particle **p, int64_t *num_p)
   char buffer[100];
   snprintf(buffer, 100, "PartType%"PRId64, AREPO_DM_PARTTYPE);
   arepo_read_dataset(HDF_FileID, filename, buffer, "ParticleIDs", *p + (*num_p),
-	 to_read, (char *)&(p[0][0].id)-(char*)(p[0]), 1, H5T_NATIVE_LLONG);
+         to_read, (char *)&(p[0][0].id)-(char*)(p[0]), 1, H5T_NATIVE_LLONG);
   arepo_read_dataset(HDF_FileID, filename, buffer, "Coordinates", *p + (*num_p),
-	 to_read, (char *)&(p[0][0].pos[0])-(char*)(p[0]), 3, H5T_NATIVE_FLOAT);
+         to_read, (char *)&(p[0][0].pos[0])-(char*)(p[0]), 3, H5T_NATIVE_FLOAT);
   arepo_read_dataset(HDF_FileID, filename, buffer, "Velocities", *p + (*num_p),
-	 to_read, (char *)&(p[0][0].pos[3])-(char*)(p[0]), 3, H5T_NATIVE_FLOAT);
+         to_read, (char *)&(p[0][0].pos[3])-(char*)(p[0]), 3, H5T_NATIVE_FLOAT);
 
   H5Fclose(HDF_FileID);
-  
+
   arepo_rescale_particles(*p, *num_p, to_read);
-  
+
   *num_p += npart[AREPO_DM_PARTTYPE];
 }
 

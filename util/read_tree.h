@@ -24,7 +24,7 @@ struct halo_index_key {
 struct halo_list {
   struct halo *halos;
   int64_t num_halos;
-  float scale;  
+  float scale;
   struct halo_index_key *halo_lookup;
 };
 

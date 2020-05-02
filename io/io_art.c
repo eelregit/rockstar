@@ -40,8 +40,8 @@ void art_detect_variant(FILE *input, char *filename) {
   if (first_word == sizeof(struct art_header1)) return;
   if (first_word == sizeof(struct art_header1a)) { ART_VARIANT=1; return; }
   fprintf(stderr, "[Error] Unrecognized ART format in %s!\n", filename);
-  fprintf(stderr, "[Error] Expected first header to be %d or %d bytes; got %d.\n", 
-	  (int32_t)sizeof(struct art_header1), (int32_t)sizeof(struct art_header1a), first_word);
+  fprintf(stderr, "[Error] Expected first header to be %d or %d bytes; got %d.\n",
+          (int32_t)sizeof(struct art_header1), (int32_t)sizeof(struct art_header1a), first_word);
   exit(1);
 }
 
@@ -103,8 +103,8 @@ void _load_particles_art_v2_b(FILE *input, struct particle **p, int64_t *num_p, 
 
     //Positions, velocities, then skip particle masses before reading IDs
     fread_fortran(buffer, sizeof(float), 3*p_in_record, input, SWAP_ENDIANNESS);
-    fread_fortran(buffer + sizeof(float)*3*p_in_record, 
-		  sizeof(float), 3*p_in_record, input, SWAP_ENDIANNESS);
+    fread_fortran(buffer + sizeof(float)*3*p_in_record,
+                  sizeof(float), 3*p_in_record, input, SWAP_ENDIANNESS);
     float *fbuffer = (float *)buffer;
     struct particle *tp = p[0]+(*num_p)+total_read;
     for (int64_t j=0; j<6; j++,fbuffer+=p_in_record)
@@ -154,12 +154,12 @@ void load_particles_art(char *filename, struct particle **p, int64_t *num_p)
 
   fread_fortran(&np, sizeof(uint32_t), 1, input, SWAP_ENDIANNESS);
   *p = check_realloc(*p, sizeof(struct particle)*((*num_p) + np),
-		     "Allocating particles.");
+                     "Allocating particles.");
 
   if (ART_VARIANT == 1) { _load_particles_art_v2_b(input, p, num_p, np, filename); return; }
 
   pbuffer = check_realloc(pbuffer, sizeof(struct art_particle)*ART_BUFFER,
-			  "Allocating particle buffer.");
+                          "Allocating particle buffer.");
 
   while ((total_read < np) && !feof(input)) {
     fread_fortran(&p_in_record, sizeof(uint32_t), 1, input, SWAP_ENDIANNESS);
@@ -167,10 +167,10 @@ void load_particles_art(char *filename, struct particle **p, int64_t *num_p)
     while ((p_in_record > 0) && !feof(input)) {
       num_read = (p_in_record > ART_BUFFER) ? ART_BUFFER : p_in_record;
       if (SWAP_ENDIANNESS)
-	num_read = fread_swap(pbuffer, sizeof(struct art_particle),
-			      num_read, input);
+        num_read = fread_swap(pbuffer, sizeof(struct art_particle),
+                              num_read, input);
       else num_read = check_fread(pbuffer, sizeof(struct art_particle),
-			    num_read, input);
+                            num_read, input);
       art_process_particles(*p,*num_p,pbuffer,num_read,part_art_header.NGRIDC);
       p_in_record -= num_read;
       total_read += num_read;

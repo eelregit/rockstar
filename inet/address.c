@@ -22,20 +22,20 @@ char *get_interface_address(char *ifname) {
   if (s != -1) {
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
       {
-	if (ifa->ifa_addr == NULL) continue;
-	if (strcmp(ifa->ifa_name, ifname)) continue;
-	family = ifa->ifa_addr->sa_family;
-	if (family == AF_INET || family == AF_INET6) {
-	  s = getnameinfo(ifa->ifa_addr,
-			  (family == AF_INET) ? sizeof(struct sockaddr_in) :
-			  sizeof(struct sockaddr_in6),
-			  host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-	  if (s == 0) {
-	    fprintf(stderr, "[Note   ] Using %s for server address on iface %s.\n", host, ifname);
-	    address = strdup(host);
-	    break;
-	  }
-	}
+        if (ifa->ifa_addr == NULL) continue;
+        if (strcmp(ifa->ifa_name, ifname)) continue;
+        family = ifa->ifa_addr->sa_family;
+        if (family == AF_INET || family == AF_INET6) {
+          s = getnameinfo(ifa->ifa_addr,
+                          (family == AF_INET) ? sizeof(struct sockaddr_in) :
+                          sizeof(struct sockaddr_in6),
+                          host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+          if (s == 0) {
+            fprintf(stderr, "[Note   ] Using %s for server address on iface %s.\n", host, ifname);
+            address = strdup(host);
+            break;
+          }
+        }
       }
     freeifaddrs(ifaddr);
   }

@@ -54,7 +54,7 @@ void *add_new_prev_file(char *filename, int64_t chunk) {
     check_realloc_s(prev_file_lengths, sizeof(int64_t),(num_prev_files+10));
     check_realloc_s(prev_chunks, sizeof(int64_t),(num_prev_files+10));
   }
-  prev_files[num_prev_files] = 
+  prev_files[num_prev_files] =
     check_mmap_file(filename, 'r', prev_file_lengths + num_prev_files);
   prev_chunks[num_prev_files] = chunk;
   num_prev_files++;
@@ -86,7 +86,7 @@ void load_prev_binary_halos(int64_t snap, int64_t chunk, float *bounds, int64_t 
 
   //Conversion in Comoving Mpc/h / (km/s)
   //Note that the time units are in 1/H = 1/(h*100 km/s/Mpc)
-  v_to_dx = 0.01*(scale_to_time(SCALE_NOW) - scale_to_time(bh.scale)) / 
+  v_to_dx = 0.01*(scale_to_time(SCALE_NOW) - scale_to_time(bh.scale)) /
     (0.5*(SCALE_NOW + bh.scale));
 
   remaining = bh.num_halos;
@@ -98,8 +98,8 @@ void load_prev_binary_halos(int64_t snap, int64_t chunk, float *bounds, int64_t 
     remaining -= to_read;
     offset += sizeof(struct halo)*to_read;
     for (i=0; i<to_read; i++) {
-      for (j=0; j<3; j++) 
-	prev_halo_buffer[i].pos[j] += v_to_dx*prev_halo_buffer[i].pos[j+3];
+      for (j=0; j<3; j++)
+        prev_halo_buffer[i].pos[j] += v_to_dx*prev_halo_buffer[i].pos[j+3];
       add_to_previous_halos(prev_halo_buffer + i, &bh, input);
     }
   }
@@ -128,7 +128,7 @@ void load_previous_halos(int64_t snap, int64_t chunk, float *bounds) {
 
   for (rchunk = 0; rchunk < NUM_WRITERS; rchunk++) {
     if (!bounds || bounds_overlap(p_bounds[rchunk].bounds, bounds,
-				  overlap_region, OVERLAP_LENGTH))
+                                  overlap_region, OVERLAP_LENGTH))
       load_prev_binary_halos(snap-1, rchunk, bounds, chunk);
   }
   check_realloc_s(prev_halo_buffer, 0, 0);
@@ -195,7 +195,7 @@ void reassign_particles_to_parent(struct halo *h, struct particle *hp, int64_t *
     if (phtree_res->points[i]->id == prev_id) {
       tph = phtree_res->points[i];
       break;
-    }    
+    }
   }
   if (!tph) return;
 
@@ -232,7 +232,7 @@ float find_previous_mass(struct halo *h, struct particle *hp, int64_t *best_num_
   if (!phtree_res->num_points) return 0;
 
   qsort(phtree_res->points, phtree_res->num_points, sizeof(struct previous_halo *),
-	sort_previous_halos);
+        sort_previous_halos);
 
   //convert_and_sort_core_particles(h, hp, 100.0*max_r, &max_particles);
   max_particles = h->num_p;
@@ -265,9 +265,9 @@ float find_previous_mass(struct halo *h, struct particle *hp, int64_t *best_num_
 #if DEBUG_FUN_TIMES
   if (best_ph && best_ph->m > 1e13 && best_particles > max_particles*0.1) {
     fprintf(stderr, "Hnow: %f %f %f (#%"PRId64"; %"PRId64"; %e); Phalo: %f %f %f (%e); %"PRId64"\n",
-	    h->pos[0], h->pos[1], h->pos[2], (int64_t)(h-halos), h->num_p, h->num_p*PARTICLE_MASS,
-	    best_ph->pos[0], best_ph->pos[1], best_ph->pos[2], best_ph->m,
-	    best_particles);
+            h->pos[0], h->pos[1], h->pos[2], (int64_t)(h-halos), h->num_p, h->num_p*PARTICLE_MASS,
+            best_ph->pos[0], best_ph->pos[1], best_ph->pos[2], best_ph->m,
+            best_particles);
   }
 #endif /* DEBUG_FUN_TIMES */
   *best_num_p = best_particles;

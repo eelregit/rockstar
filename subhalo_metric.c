@@ -24,7 +24,7 @@ void build_subtree(struct halo **subs, int64_t num_subs) {
   if (num_subs > alloced_metrics) {
     alloced_metrics = num_subs;
     sub_metric = check_realloc(sub_metric, sizeof(struct halo_metric)*num_subs,
-			       "Allocating room for halo metric tree.");
+                               "Allocating room for halo metric tree.");
   }
   for (i=0; i<num_subs; i++) {
     memcpy(sub_metric[i].pos, subs[i]->pos, sizeof(float)*3);
@@ -65,7 +65,7 @@ float calc_halo_dist(struct halo *h1, struct halo *h2) {
 }
 
 int64_t node_could_be_better(struct tree3_node *n, struct particle *part,
-			     float best_metric) {
+                             float best_metric) {
   float max_r = n->min[3]*best_metric*INV_RADIUS_WEIGHTING;
   int64_t i;
   for (i=0; i<3; i++)
@@ -75,15 +75,15 @@ int64_t node_could_be_better(struct tree3_node *n, struct particle *part,
 }
 
 struct halo *_find_best_halo(struct tree3_node *n, struct particle *part,
-			     float *best_metric, struct halo *best_halo) {
+                             float *best_metric, struct halo *best_halo) {
   int64_t i;
   float metric;
   if (n->div_dim < 0) { //At leaf node
     for (i=0; i<n->num_points; i++) {
       metric = calc_particle_dist(n->points[i].target, part);
       if (metric < *best_metric) {
-	*best_metric = metric;
-	best_halo = n->points[i].target;
+        *best_metric = metric;
+        best_halo = n->points[i].target;
       }
     }
   } else {
@@ -105,7 +105,7 @@ double calc_expected_density(struct halo *h, struct particle *part) {
   r = sqrt(r2);
   prof = 1.0+10.0*r/h->r;
   return (exp(-0.5*(v2 / (h->vrms*h->vrms))) / (h->vrms*h->vrms*h->vrms) *
-	  h->m/(h->r*h->r*r*(prof*prof)));
+          h->m/(h->r*h->r*r*(prof*prof)));
 }
 
 struct halo *alt_find_best_halo(struct particle *part, struct halo *best_halo) {
@@ -131,7 +131,7 @@ struct halo *find_best_halo(struct particle *part, struct halo *best_halo) {
 
 
 int64_t node_could_be_better_parent(struct tree3_node *n, struct halo *h,
-				    float best_metric) {
+                                    float best_metric) {
   float r = n->min[3]*INV_RADIUS_WEIGHTING;
   float max_r = r*best_metric;
   int64_t i;
@@ -143,15 +143,15 @@ int64_t node_could_be_better_parent(struct tree3_node *n, struct halo *h,
 }
 
 struct halo *_find_best_parent(struct tree3_node *n, struct halo *h,
-			       float *best_metric, struct halo *best_halo) {
+                               float *best_metric, struct halo *best_halo) {
   int64_t i;
   float metric;
   if (n->div_dim < 0) { //At leaf node
     for (i=0; i<n->num_points; i++) {
       metric = calc_halo_dist(n->points[i].target, h);
       if (metric < *best_metric) {
-	*best_metric = metric;
-	best_halo = n->points[i].target;
+        *best_metric = metric;
+        best_halo = n->points[i].target;
       }
     }
   } else {
@@ -172,8 +172,8 @@ struct halo *find_best_parent(struct halo *h, struct halo *biggest_halo) {
 }
 
 
-struct halo_metric **find_children(struct halo *h, struct halo *parent, 
-				   float r, int64_t *num_children) {
+struct halo_metric **find_children(struct halo *h, struct halo *parent,
+                                   float r, int64_t *num_children) {
   int64_t i, j, swap;
   float dx, ds, t_r;
   float pos[4];
@@ -183,15 +183,15 @@ struct halo_metric **find_children(struct halo *h, struct halo *parent,
   fast3tree_find_sphere(subtree, subtree_res, pos, t_r);
   for (i=0; i<subtree_res->num_points; i++) {
     swap = 0;
-    if (subtree_res->points[i]->target->r >= 
-	h->r) swap = 1;
+    if (subtree_res->points[i]->target->r >=
+        h->r) swap = 1;
     for (ds=0,j=0; j<3; j++) {
       dx = subtree_res->points[i]->pos[j]-h->pos[j];
       ds += dx*dx;
     }
     if (ds >= r*r) swap = 1;
     if (parent && (calc_halo_dist(h, subtree_res->points[i]->target) >
-		   calc_halo_dist(parent, subtree_res->points[i]->target)))
+                   calc_halo_dist(parent, subtree_res->points[i]->target)))
       swap = 1;
     if (swap) {
       subtree_res->points[i] = subtree_res->points[subtree_res->num_points-1];

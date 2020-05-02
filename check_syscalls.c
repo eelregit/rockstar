@@ -52,8 +52,8 @@ FILE *check_fopen(char *filename, char *mode) {
     exit(EXIT_FAILURE);
   }
 #ifdef DEBUG_IO
-  fprintf(SL, "[Note] Opened file %s with mode '%s' in fileno %d.\n", 
-	  filename, mode, fileno(res));
+  fprintf(SL, "[Note] Opened file %s with mode '%s' in fileno %d.\n",
+          filename, mode, fileno(res));
 #endif /* DEBUG_IO */
   return res;
 }
@@ -65,8 +65,8 @@ FILE *check_popen(char *command, char *mode) {
     exit(EXIT_FAILURE);
   }
 #ifdef DEBUG_IO
-  fprintf(SL, "[Note] Opened command %s with mode '%s' in fileno %d.\n", 
-	  command, mode, fileno(res));
+  fprintf(SL, "[Note] Opened command %s with mode '%s' in fileno %d.\n",
+          command, mode, fileno(res));
 #endif /* DEBUG_IO */
   return res;
 }
@@ -97,8 +97,8 @@ FILE *check_rw_socket(char *command, pid_t *pid) {
     exit(EXIT_FAILURE);
   }
 #ifdef DEBUG_IO
-  fprintf(SL, "[Note] Started command %s with mode 'r+' in fileno %d.\n", 
-	  command, fileno(res));
+  fprintf(SL, "[Note] Started command %s with mode 'r+' in fileno %d.\n",
+          command, fileno(res));
 #endif /* DEBUG_IO */
   return res;
 }
@@ -138,11 +138,11 @@ void _io_err(int rw, size_t size, size_t nitems, FILE *stream) {
   char *items = (nitems == 1) ? "item" : "items";
 
   fprintf(SL, "[Error] Failed to %s %"PRIu64" %s of size "
-	  "%"PRIu64" bytes %s fileno %d!\n", 
-	  verb, (uint64_t)nitems, items, (uint64_t)size, dir, fileno(stream));
+          "%"PRIu64" bytes %s fileno %d!\n",
+          verb, (uint64_t)nitems, items, (uint64_t)size, dir, fileno(stream));
   if (feof(stream))
     fprintf(SL, "[Error] Reason: end of file (offset %"PRIu64").\n",
-	    (uint64_t)ftello(stream));
+            (uint64_t)ftello(stream));
   else
     fprintf(SL, "[Error] Reason: %s\n", strerror(errno));
   exit(EXIT_FAILURE);
@@ -173,7 +173,7 @@ void check_limited_funread(void *ptr, size_t size, size_t nitems) {
   }
   check_realloc_s(unread, size, nitems);
   unread_size = size*nitems;
-  memcpy(unread, ptr, unread_size);  
+  memcpy(unread, ptr, unread_size);
 }
 
 size_t check_fread(void *ptr, size_t size, size_t nitems, FILE *stream) {

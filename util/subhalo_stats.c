@@ -90,10 +90,10 @@ void _calc_subhalo_stats(struct halo *h, FILE *output)
   theta = calc_angle(pos, parent->J);
   decompose_v(pos, parent->J, pos+3, &vr, &vtheta, &vphi);
   fprintf(output, "%"PRId64" %"PRId64" %.3e %.3e %.3f %.3f %.3f %.3f %.1f "
-	  "%.3f %.3f %.3f %.3f %.3f\n", h->id, parent->id, h->m/parent->m,
-	  parent->m, h->vmax/parent->vmax, parent->vmax, h->r/parent->r, 
-	  parent->r/1e3, parent->r / parent->rs, r*1e3/parent->r, theta,
-	  vr/parent->vmax, vtheta/parent->vmax, vphi/parent->vmax);
+          "%.3f %.3f %.3f %.3f %.3f\n", h->id, parent->id, h->m/parent->m,
+          parent->m, h->vmax/parent->vmax, parent->vmax, h->r/parent->r,
+          parent->r/1e3, parent->r / parent->rs, r*1e3/parent->r, theta,
+          vr/parent->vmax, vtheta/parent->vmax, vphi/parent->vmax);
 }
 
 void calc_subhalo_stats(int64_t snap)
@@ -108,7 +108,7 @@ void calc_subhalo_stats(int64_t snap)
     input = check_fopen(buffer, "rb");
     check_fread(&hdr, sizeof(struct binary_output_header), 1, input);
     halos = check_realloc(halos, sizeof(struct halo)*(num_halos+hdr.num_halos),
-			  "Allocating room for halos.");
+                          "Allocating room for halos.");
     check_fread(halos + num_halos, sizeof(struct halo), hdr.num_halos, input);
     num_halos += hdr.num_halos;
     fclose(input);
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
     if (!strcmp("-s", argv[i])) { snap = atoi(argv[i+1]); i++; }
   }
   if (!did_config) do_config(NULL);
-  if (strlen(SNAPSHOT_NAMES)) 
+  if (strlen(SNAPSHOT_NAMES))
     read_input_names(SNAPSHOT_NAMES, &snapnames, &NUM_SNAPS);
   if (strlen(BLOCK_NAMES))
     read_input_names(BLOCK_NAMES, &blocknames, &NUM_BLOCKS);

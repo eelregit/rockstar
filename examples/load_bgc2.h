@@ -9,7 +9,7 @@ extern PARTICLE_DATA_PV *parts;
 extern int64_t num_groups, num_parts;
 
 void load_bgc2(char *filename, struct bgc2_header *hdr,
-	       GROUP_DATA_RMPVMAX **groups, int64_t *num_groups,
-	       PARTICLE_DATA_PV **pdata, int64_t *num_parts);
+               GROUP_DATA_RMPVMAX **groups, int64_t *num_groups,
+               PARTICLE_DATA_PV **pdata, int64_t *num_parts);
 
 #endif /* LOAD_BGC2 */

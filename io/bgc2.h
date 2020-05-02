@@ -15,7 +15,7 @@
 #define BGC_MAGIC ((uint64_t)0x1234567801010101ll)
 #define BGC2_HEADER_SIZE 1024
 
-/* for simplicity, we waste bits in the header and use a minimum of types 
+/* for simplicity, we waste bits in the header and use a minimum of types
  * in addition, we tried to stack all int types first followed by double */
 typedef struct bgc2_header {
     uint64_t magic;             /* A magic number to identify this as a BGC file. */

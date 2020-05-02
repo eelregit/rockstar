@@ -66,8 +66,8 @@ size_t _fread_fortran(void *ptr, size_t size, size_t nitems, FILE *stream, int s
 size_t fread_fortran(void *ptr, size_t size, size_t nitems, FILE *stream, int swap) {
   int64_t nread = 0;
   while (nread < nitems)
-    nread += _fread_fortran(((char *)ptr) + (size*nread), size, nitems - nread, 
-			    stream, swap);
+    nread += _fread_fortran(((char *)ptr) + (size*nread), size, nitems - nread,
+                            stream, swap);
   return ((size_t) nread);
 }
 
@@ -104,7 +104,7 @@ size_t fwrite_fortran(void *ptr, size_t size, size_t nitems, FILE *stream) {
 }
 
 void particle_range(int64_t total_p, int64_t block, int64_t num_blocks,
-		    int64_t *p_start, int64_t *to_read) {
+                    int64_t *p_start, int64_t *to_read) {
   int64_t particles_per_block = total_p / num_blocks;
   int64_t extra_particles = total_p % num_blocks;
   *p_start = particles_per_block * block;

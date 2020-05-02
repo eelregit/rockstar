@@ -57,9 +57,9 @@ void syntax_check(struct configfile *c, char *prefix) {
   for (i=0; i<c->num_entries; i++) {
     if (!(c->touched[i]) && strlen(c->keys[i])) {
       for (j=0; j<c->num_entries; j++)
-	if (i!=j && !strcasecmp(c->keys[i], c->keys[j])) break;
+        if (i!=j && !strcasecmp(c->keys[i], c->keys[j])) break;
       if (j<c->num_entries)
-	complaint = "%s%sDuplicate config variable \"%s\". Second and further instances ignored.\n";
+        complaint = "%s%sDuplicate config variable \"%s\". Second and further instances ignored.\n";
       else complaint = "%s%sConfig variable \"%s\" not understood; please verify spelling.\n";
       fprintf(stderr, complaint, (prefix ? prefix : ""), space, c->keys[i]);
     }
@@ -117,16 +117,16 @@ inline static void trim(char **a, char **b) {
   if ((*a)>(*b)) return;
   while ((*a) <= (*b)) {
     if (!(((**a)==' ') || ((**a)=='\t'))) {
-      if (((**a)=='\'') || ((**a)=='\"')) 
-	(*a)+=1;
+      if (((**a)=='\'') || ((**a)=='\"'))
+        (*a)+=1;
       break;
-    }   
+    }
     (*a)+=1;
   }
   while ((*a) <= (*b)) {
     if (!(((**b)==' ') || ((**b)=='\t') || ((**b)=='\n') || ((**b)=='\r') || ((**b)=='\0'))) {
       if (((**b)=='\'') || ((**b)=='\"'))
-	(*b)-=1;
+        (*b)-=1;
       break;
     }
     (*b)-=1;
@@ -145,7 +145,7 @@ void load_config(struct configfile *c, char *filename) {
     c->num_entries = 0;
     return;
   }
-  
+
   while (fgets(buffer, 1024, input)) {
     val_start = buffer;
     strsep(&val_start, "#"); //Ignore comments;
@@ -176,7 +176,7 @@ void write_config(struct configfile c, char *filename) {
     fprintf(stderr, "[Error] Couldn't open file %s for writing!\n", filename);
     exit(1);
   }
-  
+
   for (i=0; i<c.num_entries; i++)
     fprintf(output, "\"%s\" = \"%s\"\n", c.keys[i], c.values[i]);
   fclose(output);

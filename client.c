@@ -66,21 +66,21 @@ void network_error_cleanup() {
 
 void reset_projection_count(void) {
   prj = check_realloc(prj, sizeof(struct projection)*num_proj,
-		      "Allocating projections.");
+                      "Allocating projections.");
   prq = check_realloc(prq, sizeof(struct projection_request)*num_proj,
-		      "Allocating projection requests.");
+                      "Allocating projection requests.");
 }
 
 struct recipient *add_recipient(int64_t struct_size, int64_t c) {
   struct recipient *r;
   num_recipients++;
   recipients = check_realloc(recipients, (sizeof(struct recipient)
-					  * num_recipients), 
-			     "Allocating particle data recipients.");
+                                          * num_recipients),
+                             "Allocating particle data recipients.");
   r = recipients+num_recipients-1;
   memset(r, 0, sizeof(struct recipient));
   r->buffer = check_realloc(NULL, struct_size*RECIPIENT_BUFFER,
-			    "Allocating recipient transmit buffer.");
+                            "Allocating recipient transmit buffer.");
 
   recv_from_socket(c, r->bounds, sizeof(float)*6);
   recv_from_socket(c, &(r->chunk), sizeof(int64_t));
@@ -109,10 +109,10 @@ void calc_particle_bounds(float *bounds) {
   memcpy(bounds+3, p[0].pos, sizeof(float)*3);
   for (i=1; i<num_p; i++) {
     for (j=0; j<3; j++) {
-      if (bounds[j] > p[i].pos[j]) 
-	bounds[j] = p[i].pos[j];
-      if (bounds[j+3] < p[i].pos[j]) 
-	bounds[j+3] = p[i].pos[j];
+      if (bounds[j] > p[i].pos[j])
+        bounds[j] = p[i].pos[j];
+      if (bounds[j+3] < p[i].pos[j])
+        bounds[j+3] = p[i].pos[j];
     }
   }
 }
@@ -159,14 +159,14 @@ void trim_particles(float *bounds) {
   }
 
   if (ROUND_AFTER_TRIM)
-    for (i=0; i<6; i++) 
+    for (i=0; i<6; i++)
       bounds[i]=((int64_t)(bounds[i]/ROUND_AFTER_TRIM + 0.5))*ROUND_AFTER_TRIM;
 
   for (i=0; i<num_p; i++)
     if (!_check_bounds_raw(p[i].pos, bounds)) {
-	num_p--;
-	p[i] = p[num_p];
-	i--;
+        num_p--;
+        p[i] = p[num_p];
+        i--;
     }
 
   p = check_realloc(p, sizeof(struct particle)*num_p, "Removing overlap.");
@@ -196,13 +196,13 @@ void clear_halo_rbuffer(struct recipient *r) {
   for (i=0; i<r->buffered; i++) pids+=bh[i].num_p;
   if (pids>num_buffer_part_ids) {
     part_id_buffer = check_realloc(part_id_buffer, sizeof(int64_t)*pids,
-				   "Allocating particle ID buffer.");
+                                   "Allocating particle ID buffer.");
     num_buffer_part_ids = pids;
   }
   pids = 0;
   for (i=0; i<r->buffered; i++) {
     memcpy(part_id_buffer + pids, part_ids + bh[i].p_start,
-	   sizeof(int64_t)*bh[i].num_p);
+           sizeof(int64_t)*bh[i].num_p);
     pids += bh[i].num_p;
   }
   send_to_socket_noconfirm(r->cs, "pids", 4);
@@ -213,9 +213,9 @@ void clear_halo_rbuffer(struct recipient *r) {
 
 void add_sp_to_buffer(struct recipient *r, struct sphere_request *sp) {
   assert(r->buffered >= 0);
-  if (!(r->buffered%1000)) 
+  if (!(r->buffered%1000))
     r->buffer = check_realloc(r->buffer, sizeof(struct sphere_request)*
-			      (r->buffered+1000), "Sphere request buffer");
+                              (r->buffered+1000), "Sphere request buffer");
   struct sphere_request *buffer = r->buffer;
   buffer[r->buffered] = *sp;
   r->buffered++;
@@ -223,21 +223,21 @@ void add_sp_to_buffer(struct recipient *r, struct sphere_request *sp) {
 
 void add_particle_to_buffer(struct recipient *r, struct particle *p1) {
   struct particle *buffer = r->buffer;
-  if (r->buffered == RECIPIENT_BUFFER) clear_particle_rbuffer(r); 
+  if (r->buffered == RECIPIENT_BUFFER) clear_particle_rbuffer(r);
   buffer[r->buffered] = *p1;
   r->buffered++;
 }
 
 void add_halo_to_buffer(struct recipient *r, struct halo *h1) {
   struct halo *buffer = r->buffer;
-  if (r->buffered == RECIPIENT_BUFFER) clear_halo_rbuffer(r); 
+  if (r->buffered == RECIPIENT_BUFFER) clear_halo_rbuffer(r);
   buffer[r->buffered] = *h1;
   r->buffered++;
 }
 
 void add_bparticle_to_buffer(struct recipient *r, struct bparticle *tbp) {
   struct bparticle *buffer = r->buffer;
-  if (r->buffered == RECIPIENT_BUFFER) clear_bparticle_rbuffer(r); 
+  if (r->buffered == RECIPIENT_BUFFER) clear_bparticle_rbuffer(r);
   buffer[r->buffered] = *tbp;
   r->buffered++;
 }
@@ -319,7 +319,7 @@ void recv_config(int64_t c) {
 void send_particles(int64_t c, float *bounds) {
   int64_t i,j;
   for (j=0; j<num_recipients; j++)
-    recipients[j].cs = 
+    recipients[j].cs =
       connect_to_addr(recipients[j].address, recipients[j].port);
 
   for (i=num_p-1; i>=0; i--) {
@@ -357,7 +357,7 @@ void send_bparticles(char *c_address, char *c_port) {
     send_to_socket(recipients[j].cs, "done", 4);
     close_rsocket(recipients[j].cs);
   }
-  
+
   c = connect_to_addr(c_address, c_port);
   send_to_socket(c, "rdne", 4);
   exit(0);
@@ -386,13 +386,13 @@ void gather_spheres(char *c_address, char *c_port, float *bounds, int64_t id_off
     c = connect_to_addr(recipients[j].address, recipients[j].port);
     send_to_socket_noconfirm(c, "sphr", 4);
     send_to_socket_noconfirm(c, recipients[j].buffer,
-	       sizeof(struct sphere_request)*recipients[j].buffered);
+               sizeof(struct sphere_request)*recipients[j].buffered);
     k=1;
     while (1) {
       recv_from_socket(c, &k, sizeof(int64_t));
       if (!k) break;
       ep2 = check_realloc(ep2, sizeof(struct extended_particle)*(num_ep2+k),
-			  "Allocating secondary extended particles.");
+                          "Allocating secondary extended particles.");
       recv_from_socket(c, ep2+num_ep2, sizeof(struct extended_particle)*k);
       num_ep2+=k;
     }
@@ -401,7 +401,7 @@ void gather_spheres(char *c_address, char *c_port, float *bounds, int64_t id_off
   }
 
   output_bgc2(id_offset, snap, chunk, bounds);
-  
+
   c = connect_to_addr(c_address, c_port);
   //  send_to_socket_noconfirm(c, "mass", 4);
   //send_to_socket(c, halos, sizeof(struct halo)*num_halos);
@@ -431,7 +431,7 @@ void collect_bgroups(int64_t chunk) {
   for (i=0,total_bg=0; i<num_bg_sets; i++) total_bg+=bg_set_sizes[i];
   while (num_bg_sets && total_bg) {
     c = connect_to_addr(chunk_info[connect_chunk].address,
-			chunk_info[connect_chunk].port);
+                        chunk_info[connect_chunk].port);
     send_to_socket_noconfirm(c, "lnkb", 4);
     send_to_socket_noconfirm(c, &chunk, sizeof(int64_t));
     send_to_socket_noconfirm(c, &num_bg_sets, sizeof(int64_t));
@@ -456,7 +456,7 @@ void collect_bgroups(int64_t chunk) {
   check_realloc_s(sets_per_chunk, sizeof(int64_t), NUM_WRITERS);
   check_realloc_s(chunk_indices, sizeof(int64_t), NUM_WRITERS);
   for (i=0; i<NUM_WRITERS; i++) sets_per_chunk[i] = chunk_indices[i] = 0;
-  
+
   //Sort bg sets by the chunk with max # of particles
   j=0;
   for (i=0; i<num_bg_sets; i++) {
@@ -471,12 +471,12 @@ void collect_bgroups(int64_t chunk) {
     cur_c = final_bg[j].chunk;
     for (k=j; k<j+bg_set_sizes[i]; k++) {
       if (cur_c != final_bg[k].chunk) {
-	if (cur_p > max_p) {
-	  max_c = cur_c;
-	  max_p = cur_p;
-	}
-	cur_c = final_bg[k].chunk;
-	cur_p = 0;
+        if (cur_p > max_p) {
+          max_c = cur_c;
+          max_p = cur_p;
+        }
+        cur_c = final_bg[k].chunk;
+        cur_p = 0;
       }
       cur_p += final_bg[k].num_p;
     }
@@ -522,13 +522,13 @@ void collect_bgroups(int64_t chunk) {
   for (connect_chunk=0; connect_chunk<NUM_WRITERS; connect_chunk++) {
     if (!sets_per_chunk[connect_chunk]) continue;
     c = connect_to_addr(chunk_info[connect_chunk].address,
-		      chunk_info[connect_chunk].port);
+                      chunk_info[connect_chunk].port);
     send_to_socket_noconfirm(c, "strb", 4);
     send_to_socket_noconfirm(c, &chunk, sizeof(int64_t));
     send_to_socket_noconfirm(c, sets_per_chunk+connect_chunk, sizeof(int64_t));
     chunk_indices[connect_chunk]-=sets_per_chunk[connect_chunk];
     send_to_socket_noconfirm(c, bg_set_sizes+chunk_indices[connect_chunk],
-			     sizeof(int64_t)*sets_per_chunk[connect_chunk]);
+                             sizeof(int64_t)*sets_per_chunk[connect_chunk]);
     for (j=0,total_bg=0; j<sets_per_chunk[connect_chunk]; j++)
       total_bg+=bg_set_sizes[chunk_indices[connect_chunk]+j];
     send_to_socket_noconfirm(c, final_bg+chunk_offset, total_bg*sizeof(struct bgroup));
@@ -538,7 +538,7 @@ void collect_bgroups(int64_t chunk) {
   }
 
   c = connect_to_addr(chunk_info[chunk].address,
-		      chunk_info[chunk].port);
+                      chunk_info[chunk].port);
   send_to_socket(c, "rdne", 4);
   close_rsocket(c);
   exit(0);
@@ -564,7 +564,7 @@ void send_halos(char *c_address, char *c_port, int64_t snap, int64_t chunk) {
     send_to_socket(recipients[j].cs, "done", 4);
     close_rsocket(recipients[j].cs);
   }
-  
+
   c = connect_to_addr(c_address, c_port);
   send_to_socket(c, "rdne", 4);
   exit(0);
@@ -603,158 +603,158 @@ void transfer_stuff(int64_t s, int64_t c, int64_t timestep) {
     for (i=0; i<max_conn; i++) {
       if (!check_rsocket_tag(i)) continue;
       if (i==s) {
-	num_senders++;
-	senders = check_realloc(senders, sizeof(int64_t)*num_senders,
-				"Allocating particle sender FDs.");
-	senders[num_senders-1] = accept_connection(s,NULL,NULL);
+        num_senders++;
+        senders = check_realloc(senders, sizeof(int64_t)*num_senders,
+                                "Allocating particle sender FDs.");
+        senders[num_senders-1] = accept_connection(s,NULL,NULL);
       }
       else if (i==c) {
-	recv_from_socket(c, cmd, 4);
-	if (!strcmp(cmd, "done")) { done = 1; }
-	else if (!strcmp(cmd, "err!")) {
-	  in_error_state = 1;
-	  for (j=0; j<num_senders; j++) close_rsocket(senders[j]);
-	  num_senders = 0;
-	  break;
-	}
-	else { fprintf(stderr, "[Error] Server protocol error rs (%s)!\n", cmd); exit(1); }
+        recv_from_socket(c, cmd, 4);
+        if (!strcmp(cmd, "done")) { done = 1; }
+        else if (!strcmp(cmd, "err!")) {
+          in_error_state = 1;
+          for (j=0; j<num_senders; j++) close_rsocket(senders[j]);
+          num_senders = 0;
+          break;
+        }
+        else { fprintf(stderr, "[Error] Server protocol error rs (%s)!\n", cmd); exit(1); }
       }
       else {
-	if (recv_from_socket(i, cmd, 4)<=0) {
-	  network_io_err(c);
-	  for (j=0; j<num_senders; j++) close_rsocket(senders[j]);
-	  num_senders = 0;
-	  break;
-	}
-	if (!strcmp(cmd, "part")) {
-	  length = num_p*sizeof(struct particle);
-	  p = recv_msg(i, p, &length, length);
-	  assert(!(length%(sizeof(struct particle))));
-	  num_p = length / sizeof(struct particle);
-	}
+        if (recv_from_socket(i, cmd, 4)<=0) {
+          network_io_err(c);
+          for (j=0; j<num_senders; j++) close_rsocket(senders[j]);
+          num_senders = 0;
+          break;
+        }
+        if (!strcmp(cmd, "part")) {
+          length = num_p*sizeof(struct particle);
+          p = recv_msg(i, p, &length, length);
+          assert(!(length%(sizeof(struct particle))));
+          num_p = length / sizeof(struct particle);
+        }
 
-	else if (!strcmp(cmd, "sphr")) {
-	  length = 0;
-	  sp = recv_msg(i, NULL, &length, length);
-	  assert(!(length%(sizeof(struct sphere_request))));
-	  length /= sizeof(struct sphere_request);
-	  if (!epbuffer) epbuffer = check_realloc(NULL, sizeof(struct extended_particle)*PARTICLE_REALLOC_NUM, "Particle buffer");
-	  if (!bitarray) bitarray = BIT_ALLOC(num_p+num_additional_p);
-	  BIT_ALL_CLEAR(bitarray, num_p+num_additional_p);
-	  k=0;
-	  for (j=0; j<length; j++) {
-	    int64_t l, num_sp;
-	    struct extended_particle **result = 
-	      do_sphere_request(sp[j].cen, sp[j].r, &num_sp);
-	    for (l=0; l<num_sp; l++) {
-	      if (BIT_TST(bitarray, result[l]-ep)) continue;
-	      BIT_SET(bitarray, result[l]-ep);
-	      epbuffer[k] = result[l][0];
-	      epbuffer[k].hid = -1;
-	      k++;
-	      if (k==PARTICLE_REALLOC_NUM) {
-		send_to_socket_noconfirm(i, &k, sizeof(int64_t));
-		send_to_socket_noconfirm(i, epbuffer, sizeof(struct extended_particle)*k);
-		k=0;
-	      }
-	    }
-	  }
-	  if (k) {
-	    send_to_socket_noconfirm(i, &k, sizeof(int64_t));
-	    send_to_socket_noconfirm(i, epbuffer, sizeof(struct extended_particle)*k);
-	    k=0;
-	  }
-	  send_to_socket_noconfirm(i, &k, sizeof(int64_t));
-	  free(sp);
-	}
+        else if (!strcmp(cmd, "sphr")) {
+          length = 0;
+          sp = recv_msg(i, NULL, &length, length);
+          assert(!(length%(sizeof(struct sphere_request))));
+          length /= sizeof(struct sphere_request);
+          if (!epbuffer) epbuffer = check_realloc(NULL, sizeof(struct extended_particle)*PARTICLE_REALLOC_NUM, "Particle buffer");
+          if (!bitarray) bitarray = BIT_ALLOC(num_p+num_additional_p);
+          BIT_ALL_CLEAR(bitarray, num_p+num_additional_p);
+          k=0;
+          for (j=0; j<length; j++) {
+            int64_t l, num_sp;
+            struct extended_particle **result =
+              do_sphere_request(sp[j].cen, sp[j].r, &num_sp);
+            for (l=0; l<num_sp; l++) {
+              if (BIT_TST(bitarray, result[l]-ep)) continue;
+              BIT_SET(bitarray, result[l]-ep);
+              epbuffer[k] = result[l][0];
+              epbuffer[k].hid = -1;
+              k++;
+              if (k==PARTICLE_REALLOC_NUM) {
+                send_to_socket_noconfirm(i, &k, sizeof(int64_t));
+                send_to_socket_noconfirm(i, epbuffer, sizeof(struct extended_particle)*k);
+                k=0;
+              }
+            }
+          }
+          if (k) {
+            send_to_socket_noconfirm(i, &k, sizeof(int64_t));
+            send_to_socket_noconfirm(i, epbuffer, sizeof(struct extended_particle)*k);
+            k=0;
+          }
+          send_to_socket_noconfirm(i, &k, sizeof(int64_t));
+          free(sp);
+        }
 
-	else if (!strcmp(cmd, "bprt")) {
-	  length = num_bp*sizeof(struct bparticle);
-	  bp = recv_msg(i, bp, &length, length);
-	  assert(!(length%(sizeof(struct bparticle))));
-	  int64_t old_bp = num_bp;
-	  num_bp = length / sizeof(struct bparticle);
-	  num_new_bp += num_bp - old_bp;
-	}
+        else if (!strcmp(cmd, "bprt")) {
+          length = num_bp*sizeof(struct bparticle);
+          bp = recv_msg(i, bp, &length, length);
+          assert(!(length%(sizeof(struct bparticle))));
+          int64_t old_bp = num_bp;
+          num_bp = length / sizeof(struct bparticle);
+          num_new_bp += num_bp - old_bp;
+        }
 
-	else if (!strcmp(cmd, "halo")) {
-	  assert(timestep > 0);
-	  bheader = (timestep > 1) ? &head2 : &head1;
-	  pids_recv = (timestep > 1) ? &part2 : &part1;
-	  halos_recv = (timestep > 1) ? &halos2 : &halos1;
+        else if (!strcmp(cmd, "halo")) {
+          assert(timestep > 0);
+          bheader = (timestep > 1) ? &head2 : &head1;
+          pids_recv = (timestep > 1) ? &part2 : &part1;
+          halos_recv = (timestep > 1) ? &halos2 : &halos1;
 
-	  length = bheader->num_halos*sizeof(struct halo);
-	  *halos_recv = recv_msg(i, *halos_recv, &length, length);
-	  assert(!(length%sizeof(struct halo)));
-	  length /= sizeof(struct halo);
+          length = bheader->num_halos*sizeof(struct halo);
+          *halos_recv = recv_msg(i, *halos_recv, &length, length);
+          assert(!(length%sizeof(struct halo)));
+          length /= sizeof(struct halo);
 
-	  //Redo particle pointers
-	  new_p_start = bheader->num_particles;
-	  for (j=bheader->num_halos; j<length; j++) {
-	    th = (*halos_recv) + j;
-	    th->p_start = new_p_start;
-	    new_p_start += th->num_p;
-	  }
-	  bheader->num_halos = length;
+          //Redo particle pointers
+          new_p_start = bheader->num_particles;
+          for (j=bheader->num_halos; j<length; j++) {
+            th = (*halos_recv) + j;
+            th->p_start = new_p_start;
+            new_p_start += th->num_p;
+          }
+          bheader->num_halos = length;
 
-	  recv_from_socket(i, cmd, 4);
-	  assert(!strcmp(cmd, "pids"));
-	  length = bheader->num_particles*sizeof(int64_t);
-	  *pids_recv = recv_msg(i, *pids_recv, &length, length);
-	  assert(!(length%sizeof(int64_t)));
-	  bheader->num_particles = length / sizeof(int64_t);
-	}
+          recv_from_socket(i, cmd, 4);
+          assert(!strcmp(cmd, "pids"));
+          length = bheader->num_particles*sizeof(int64_t);
+          *pids_recv = recv_msg(i, *pids_recv, &length, length);
+          assert(!(length%sizeof(int64_t)));
+          bheader->num_particles = length / sizeof(int64_t);
+        }
 
-	else if (!strcmp(cmd, "lnkb") || !strcmp(cmd, "strb")) {
-	  int64_t num_sets = 0, client_chunk, total_groups, total_bg;
-	  recv_from_socket(i, &client_chunk, sizeof(int64_t));
-	  recv_from_socket(i, &num_sets, sizeof(int64_t));
-	  int64_t *set_sizes = NULL;
-	  struct bgroup *bgroup_request = NULL;
-	  if (!strcmp(cmd, "lnkb")) {
-	    if (num_sets) {
-	      set_sizes = recv_and_alloc(i, NULL, sizeof(int64_t)*num_sets);
-	      for (j=0,total_bg=0; j<num_sets; j++) total_bg += set_sizes[j];
-	      bgroup_request = recv_and_alloc(i, NULL, sizeof(struct bgroup)*total_bg);
-	    }
-	    find_bgroup_sets(client_chunk, &num_sets, &set_sizes,
-			     &bgroup_request, &total_groups);
-	    send_to_socket_noconfirm(i, &num_sets, sizeof(int64_t));
-	    if (num_sets) {
-	      send_to_socket_noconfirm(i, set_sizes, sizeof(int64_t)*num_sets);
-	      send_to_socket_noconfirm(i, bgroup_request,
-			     sizeof(struct bgroup)*total_groups);
-	      free(set_sizes);
-	      free(bgroup_request);
-	    }
-	  }
-	  else if (num_sets) {
-	      check_realloc_s(bg_set_sizes, sizeof(int64_t), num_bg_sets+num_sets);
-	      recv_from_socket(i, bg_set_sizes+num_bg_sets, sizeof(int64_t)*num_sets);
-	      for (j=0,total_bg=0; j<num_bg_sets+num_sets; j++) total_bg += bg_set_sizes[j];
-	      check_realloc_s(final_bg, sizeof(struct bgroup), total_bg);
-	      bgroup_request = final_bg + total_bg;
-	      for (j=0,total_bg=0; j<num_sets; j++) total_bg += bg_set_sizes[j+num_bg_sets];
-	      bgroup_request -= total_bg;
-	      recv_from_socket(i, bgroup_request, sizeof(struct bgroup)*total_bg);
-	      num_bg_sets += num_sets;
-	  }
-	}
+        else if (!strcmp(cmd, "lnkb") || !strcmp(cmd, "strb")) {
+          int64_t num_sets = 0, client_chunk, total_groups, total_bg;
+          recv_from_socket(i, &client_chunk, sizeof(int64_t));
+          recv_from_socket(i, &num_sets, sizeof(int64_t));
+          int64_t *set_sizes = NULL;
+          struct bgroup *bgroup_request = NULL;
+          if (!strcmp(cmd, "lnkb")) {
+            if (num_sets) {
+              set_sizes = recv_and_alloc(i, NULL, sizeof(int64_t)*num_sets);
+              for (j=0,total_bg=0; j<num_sets; j++) total_bg += set_sizes[j];
+              bgroup_request = recv_and_alloc(i, NULL, sizeof(struct bgroup)*total_bg);
+            }
+            find_bgroup_sets(client_chunk, &num_sets, &set_sizes,
+                             &bgroup_request, &total_groups);
+            send_to_socket_noconfirm(i, &num_sets, sizeof(int64_t));
+            if (num_sets) {
+              send_to_socket_noconfirm(i, set_sizes, sizeof(int64_t)*num_sets);
+              send_to_socket_noconfirm(i, bgroup_request,
+                             sizeof(struct bgroup)*total_groups);
+              free(set_sizes);
+              free(bgroup_request);
+            }
+          }
+          else if (num_sets) {
+              check_realloc_s(bg_set_sizes, sizeof(int64_t), num_bg_sets+num_sets);
+              recv_from_socket(i, bg_set_sizes+num_bg_sets, sizeof(int64_t)*num_sets);
+              for (j=0,total_bg=0; j<num_bg_sets+num_sets; j++) total_bg += bg_set_sizes[j];
+              check_realloc_s(final_bg, sizeof(struct bgroup), total_bg);
+              bgroup_request = final_bg + total_bg;
+              for (j=0,total_bg=0; j<num_sets; j++) total_bg += bg_set_sizes[j+num_bg_sets];
+              bgroup_request -= total_bg;
+              recv_from_socket(i, bgroup_request, sizeof(struct bgroup)*total_bg);
+              num_bg_sets += num_sets;
+          }
+        }
 
-	else if (!strcmp(cmd, "cnfg")) {
-	  recv_config(i);
-	}
+        else if (!strcmp(cmd, "cnfg")) {
+          recv_config(i);
+        }
 
-	else if (!strcmp(cmd, "done")) {
-	  close_connection(i, senders, &num_senders);
-	}
+        else if (!strcmp(cmd, "done")) {
+          close_connection(i, senders, &num_senders);
+        }
 
-	else if (!strcmp(cmd, "rdne")) {
-	  close_connection(i, senders, &num_senders);
-	  send_to_socket_noconfirm(c, "done", 4);
-	}
+        else if (!strcmp(cmd, "rdne")) {
+          close_connection(i, senders, &num_senders);
+          send_to_socket_noconfirm(c, "done", 4);
+        }
 
-	else { fprintf(stderr, "[Error] Client protocol error rs (%s)!\n", cmd); exit(1); }
+        else { fprintf(stderr, "[Error] Client protocol error rs (%s)!\n", cmd); exit(1); }
       }
     }
   }
@@ -775,9 +775,9 @@ void do_projections(void) {
   for (j=0; j<num_p; j++) {
     for (i=0; i<num_proj; i++) {
       if (check_projection_bounds(p+j, prj+i)) {
-	idx = (double)PROJECTION_SIZE*p[j].pos[dir]/(double)BOX_SIZE;
-	if (idx >= PROJECTION_SIZE) idx = PROJECTION_SIZE-1;
-	prj[i].data[idx]++;
+        idx = (double)PROJECTION_SIZE*p[j].pos[dir]/(double)BOX_SIZE;
+        if (idx >= PROJECTION_SIZE) idx = PROJECTION_SIZE-1;
+        prj[i].data[idx]++;
       }
     }
   }
@@ -829,84 +829,84 @@ void accept_workloads(char *c_address, char *c_port, int64_t snap, int64_t chunk
       assert(w.chunk >= 0 && w.chunk < NUM_WRITERS);
       memcpy(chunk_info[w.chunk].bounds, w.bounds, sizeof(float)*6);
       if (w.num_particles)
-	recv_from_socket(m, p, sizeof(struct particle)*w.num_particles);
+        recv_from_socket(m, p, sizeof(struct particle)*w.num_particles);
       record_time(recv_time);
 
       if (w.num_meta_fofs) {
-	set_sizes=recv_and_alloc(m, set_sizes, sizeof(int64_t)*w.num_meta_fofs);
-	bgroup_list = recv_and_alloc(m, bgroup_list, sizeof(struct bgroup)*w.total_bg);
-	loc = 0;
-	for (i=0; i<w.num_meta_fofs; i++) {
-	  qsort(bgroup_list+loc, set_sizes[i], sizeof(struct bgroup), sort_by_chunk);
-	  loc += set_sizes[i];
-	}
+        set_sizes=recv_and_alloc(m, set_sizes, sizeof(int64_t)*w.num_meta_fofs);
+        bgroup_list = recv_and_alloc(m, bgroup_list, sizeof(struct bgroup)*w.total_bg);
+        loc = 0;
+        for (i=0; i<w.num_meta_fofs; i++) {
+          qsort(bgroup_list+loc, set_sizes[i], sizeof(struct bgroup), sort_by_chunk);
+          loc += set_sizes[i];
+        }
 
-	loc = w.num_particles;
-	for (i=0; i<w.total_bg; i++) {
-	  bgroup_list[i].tagged = loc;
-	  loc += bgroup_list[i].num_p;
-	}
-	qsort(bgroup_list, w.total_bg, sizeof(struct bgroup), sort_by_chunk);
-	int64_t dup_ids = 0;
-	for (i=1; i<w.total_bg; i++) 
-	  if (bgroup_list[i].chunk == bgroup_list[i-1].chunk &&
-	      bgroup_list[i].id == bgroup_list[i-1].id) dup_ids=1;
+        loc = w.num_particles;
+        for (i=0; i<w.total_bg; i++) {
+          bgroup_list[i].tagged = loc;
+          loc += bgroup_list[i].num_p;
+        }
+        qsort(bgroup_list, w.total_bg, sizeof(struct bgroup), sort_by_chunk);
+        int64_t dup_ids = 0;
+        for (i=1; i<w.total_bg; i++)
+          if (bgroup_list[i].chunk == bgroup_list[i-1].chunk &&
+              bgroup_list[i].id == bgroup_list[i-1].id) dup_ids=1;
 
-	i=0;
-	num_chunks = 0;
-	while (i<w.total_bg) {
-	  loc = i;
-	  int64_t part_in_chunk = 0, part_received = 0;
-	  for (; i<w.total_bg; i++) {
-	    if (bgroup_list[loc].chunk != bgroup_list[i].chunk) break;
-	    part_in_chunk += bgroup_list[i].num_p;
-	  }
-	  int64_t num_groups = i-loc;
-	  if (!num_groups || !part_in_chunk) break;
-	  int64_t cchunk = bgroup_list[loc].chunk;
-	  chunks[num_chunks] = cchunk;
-	  num_chunks++;
-	  int64_t m2 = connect_to_addr(chunk_info[cchunk].address,
-				       chunk_info[cchunk].port);
-	  send_to_socket_noconfirm(m2, &minus1, sizeof(int64_t));
-	  send_to_socket_noconfirm(m2, "part", 4);
-	  send_to_socket_noconfirm(m2, &num_groups, sizeof(int64_t));
-	  send_to_socket_noconfirm(m2, bgroup_list + loc, sizeof(struct bgroup)*num_groups);
-	  recv_from_socket(m2, chunk_info[cchunk].bounds, sizeof(float)*6);
+        i=0;
+        num_chunks = 0;
+        while (i<w.total_bg) {
+          loc = i;
+          int64_t part_in_chunk = 0, part_received = 0;
+          for (; i<w.total_bg; i++) {
+            if (bgroup_list[loc].chunk != bgroup_list[i].chunk) break;
+            part_in_chunk += bgroup_list[i].num_p;
+          }
+          int64_t num_groups = i-loc;
+          if (!num_groups || !part_in_chunk) break;
+          int64_t cchunk = bgroup_list[loc].chunk;
+          chunks[num_chunks] = cchunk;
+          num_chunks++;
+          int64_t m2 = connect_to_addr(chunk_info[cchunk].address,
+                                       chunk_info[cchunk].port);
+          send_to_socket_noconfirm(m2, &minus1, sizeof(int64_t));
+          send_to_socket_noconfirm(m2, "part", 4);
+          send_to_socket_noconfirm(m2, &num_groups, sizeof(int64_t));
+          send_to_socket_noconfirm(m2, bgroup_list + loc, sizeof(struct bgroup)*num_groups);
+          recv_from_socket(m2, chunk_info[cchunk].bounds, sizeof(float)*6);
 
-	  int64_t k=0,l=0;
-	  while (part_received < part_in_chunk) {
-	    int64_t this_received = 0;
-	    pbuffer = recv_msg(m2, pbuffer, &this_received, 0);
-	    assert((this_received % (sizeof(struct particle)))==0);
-	    this_received /= sizeof(struct particle);
-	    part_received += this_received;
-	    for (l=0; l<this_received; l++,k++) {
-	      while (k==bgroup_list[loc].num_p) { k=0; loc++; }
-	      p[bgroup_list[loc].tagged+k] = pbuffer[l];
-	    }
-	  }
-	  close_rsocket(m2);
-	}
-	if (memcmp(w.bounds, zero_bounds, sizeof(float)*6)!=0) {
-	  if (!PERIODIC || !BOX_SIZE) calc_particle_bounds(w.bounds);
-	  else calc_particle_bounds_periodic(w.bounds);
-	}
-	new_bounds = 1;
-	assert(!dup_ids);
+          int64_t k=0,l=0;
+          while (part_received < part_in_chunk) {
+            int64_t this_received = 0;
+            pbuffer = recv_msg(m2, pbuffer, &this_received, 0);
+            assert((this_received % (sizeof(struct particle)))==0);
+            this_received /= sizeof(struct particle);
+            part_received += this_received;
+            for (l=0; l<this_received; l++,k++) {
+              while (k==bgroup_list[loc].num_p) { k=0; loc++; }
+              p[bgroup_list[loc].tagged+k] = pbuffer[l];
+            }
+          }
+          close_rsocket(m2);
+        }
+        if (memcmp(w.bounds, zero_bounds, sizeof(float)*6)!=0) {
+          if (!PERIODIC || !BOX_SIZE) calc_particle_bounds(w.bounds);
+          else calc_particle_bounds_periodic(w.bounds);
+        }
+        new_bounds = 1;
+        assert(!dup_ids);
       }
       else {
-	num_chunks = 1;
-	chunks[0] = w.chunk;
+        num_chunks = 1;
+        chunks[0] = w.chunk;
       }
       record_time(bp_time);
 
       if (CLIENT_DEBUG) fprintf(stderr, "Received %"PRId64" particles and %"PRId64" fofs from id %"PRId64" (Worker %"PRId64")\n", num_p, w.num_fofs, id-NUM_READERS, chunk);
       if (new_bounds && TEMPORAL_HALO_FINDING) {
-	new_bounds = 0;
-	if (!memcmp(w.bounds, zero_bounds, sizeof(float)*6))
-	  load_previous_halos(snap, w.chunk, NULL); //Single processor
-	else load_previous_halos(snap, w.chunk, w.bounds);
+        new_bounds = 0;
+        if (!memcmp(w.bounds, zero_bounds, sizeof(float)*6))
+          load_previous_halos(snap, w.chunk, NULL); //Single processor
+        else load_previous_halos(snap, w.chunk, w.bounds);
       }
 
       record_time(ph_time);
@@ -922,31 +922,31 @@ void accept_workloads(char *c_address, char *c_port, int64_t snap, int64_t chunk
       //      fprintf(stderr, "Workunit done (%"PRId64" halos found; %"PRId64" chunks)!!!\n", num_halos, num_chunks);
       for (i=0; i<num_halos; i++) wrap_into_box(halos[i].pos);
       for (i=0; i<num_chunks; i++) {
-	struct fof *chunk_fofs=NULL;
-	struct halo *chunk_halos=NULL;
-	struct extra_halo_info *chunk_ei=NULL;
-	struct particle *chunk_p=NULL;
-	struct workunit_info chunk_w = w;
-	sort_out_halos_for_chunk(chunks[i], chunk_info[chunks[i]].bounds, &chunk_w, &chunk_fofs, &chunk_halos, &chunk_ei, &chunk_p, fofs);
-	if (chunk_w.num_halos) {
-	  int64_t m2 = connect_to_addr(chunk_info[chunks[i]].address,
-				       chunk_info[chunks[i]].port);
-	  send_to_socket_noconfirm(m2, &minus1, sizeof(int64_t));
-	  send_to_socket_noconfirm(m2, "wrkd", 4);
-	  send_to_socket_noconfirm(m2, &chunk_w, sizeof(struct workunit_info));
-	  send_to_socket_noconfirm(m2, chunk_fofs, sizeof(struct fof)*chunk_w.num_fofs);
-	  send_to_socket_noconfirm(m2, chunk_halos, sizeof(struct halo)*chunk_w.num_halos);
-	  send_to_socket_noconfirm(m2, chunk_ei, sizeof(struct extra_halo_info)*chunk_w.num_halos);
-	  send_to_socket(m2, chunk_p, sizeof(struct particle)*(chunk_w.num_particles+chunk_w.num_meta_p));
-	  close_rsocket(m2);
+        struct fof *chunk_fofs=NULL;
+        struct halo *chunk_halos=NULL;
+        struct extra_halo_info *chunk_ei=NULL;
+        struct particle *chunk_p=NULL;
+        struct workunit_info chunk_w = w;
+        sort_out_halos_for_chunk(chunks[i], chunk_info[chunks[i]].bounds, &chunk_w, &chunk_fofs, &chunk_halos, &chunk_ei, &chunk_p, fofs);
+        if (chunk_w.num_halos) {
+          int64_t m2 = connect_to_addr(chunk_info[chunks[i]].address,
+                                       chunk_info[chunks[i]].port);
+          send_to_socket_noconfirm(m2, &minus1, sizeof(int64_t));
+          send_to_socket_noconfirm(m2, "wrkd", 4);
+          send_to_socket_noconfirm(m2, &chunk_w, sizeof(struct workunit_info));
+          send_to_socket_noconfirm(m2, chunk_fofs, sizeof(struct fof)*chunk_w.num_fofs);
+          send_to_socket_noconfirm(m2, chunk_halos, sizeof(struct halo)*chunk_w.num_halos);
+          send_to_socket_noconfirm(m2, chunk_ei, sizeof(struct extra_halo_info)*chunk_w.num_halos);
+          send_to_socket(m2, chunk_p, sizeof(struct particle)*(chunk_w.num_particles+chunk_w.num_meta_p));
+          close_rsocket(m2);
 
-	  if (chunk_p != p) {
-	    free(chunk_fofs);
-	    free(chunk_halos);
-	    free(chunk_ei);
-	    free(chunk_p);
-	  }
-	}
+          if (chunk_p != p) {
+            free(chunk_fofs);
+            free(chunk_halos);
+            free(chunk_ei);
+            free(chunk_p);
+          }
+        }
       }
 
       send_to_socket(m, "wrku", 4);
@@ -967,16 +967,16 @@ void accept_workloads(char *c_address, char *c_port, int64_t snap, int64_t chunk
       port = recv_msg_nolength(s, port);
       m = connect_to_addr(address, port);
       if (m<0) {
-	send_to_socket(s, "clos", 4);
-	exit(1);
+        send_to_socket(s, "clos", 4);
+        exit(1);
       }
       send_to_socket(m, &chunk, sizeof(int64_t));
       new_bounds = 1;
     }
     else if (!strcmp(cmd, "fini")) {
       record_time(f_time);
-      if (profile_out) 
-	fprintf(profile_out, "[Prof] S%"PRId64",C%"PRId64": %"PRId64"p,%"PRId64"h,%"PRId64"w; wt:%"PRId64"s; rcv:%"PRId64"s,%"PRId64"s; snd:%"PRId64"s; wk:%"PRId64"s; idl:%"PRId64"s\n", snap, chunk, total_pp, total_h, total_wku, idle_time, recv_time, bp_time, send_time, work_time, f_time);
+      if (profile_out)
+        fprintf(profile_out, "[Prof] S%"PRId64",C%"PRId64": %"PRId64"p,%"PRId64"h,%"PRId64"w; wt:%"PRId64"s; rcv:%"PRId64"s,%"PRId64"s; snd:%"PRId64"s; wk:%"PRId64"s; idl:%"PRId64"s\n", snap, chunk, total_pp, total_h, total_wku, idle_time, recv_time, bp_time, send_time, work_time, f_time);
       fflush(profile_out);
       exit(0);
     }
@@ -989,10 +989,10 @@ void accept_workloads(char *c_address, char *c_port, int64_t snap, int64_t chunk
 }
 
 int send_workunit(int64_t sock, struct workunit_info *w,
-		  struct fof **fofs, struct particle **particles,
-		  int64_t **set_sizes, struct bgroup **bgroup_list,
-		  int64_t *no_more_work, int64_t chunk, float *bounds) {
-  if (!(*no_more_work)) 
+                  struct fof **fofs, struct particle **particles,
+                  int64_t **set_sizes, struct bgroup **bgroup_list,
+                  int64_t *no_more_work, int64_t chunk, float *bounds) {
+  if (!(*no_more_work))
     find_unfinished_workunit(w, fofs, particles, set_sizes, bgroup_list);
   if ((*no_more_work) || (!w->num_fofs)) {
     *no_more_work = 1;
@@ -1051,132 +1051,132 @@ int64_t distribute_workloads(int64_t c, int64_t s, int64_t snap, int64_t chunk, 
       if (!check_rsocket_tag(i)) continue;
 
       if (i==s) {
-	new_w = accept_connection(s,NULL,NULL);
-	recv_from_socket(new_w, &worker_chunk, sizeof(int64_t));
-	if (worker_chunk == chunk) {
-	  assert(child < 0);
-	  child = new_w;
-	  child_has_connected = 1;
-	}
-	if (worker_chunk == -1) {
-	  if (recv_from_socket(new_w, cmd, 4) <= 0) {
-	    network_io_err(c);
-	    for (j=0; j<num_workers; j++) close_rsocket(workers[j]);
-	    num_workers = 0;
-	    break;
-	  }
-	  if (!strcmp(cmd, "part")) {
-	    int64_t num_groups;
-	    recv_from_socket(new_w, &num_groups, sizeof(int64_t));
-	    bgroup_list = recv_and_alloc(new_w, NULL, num_groups*sizeof(struct bgroup));
-	    send_to_socket(new_w, bounds, sizeof(float)*6);
-	    if (!pbuffer) pbuffer = check_realloc(NULL, sizeof(struct particle)*PARTICLE_REALLOC_NUM, "Particle buffer");
-	    int64_t k = 0, l = 0;
-	    struct fof tf;
-	    for (j=0; j<num_groups; j++) {
-	      assert(bgroup_list[j].chunk == chunk);
-	      fof_of_id(bgroup_list[j].id, &tf);
-	      assert(tf.num_p == bgroup_list[j].num_p);
-	      for (k=0; k<tf.num_p; k++) {
-		pbuffer[l] = tf.particles[k];
-		l++;
-		if (l==PARTICLE_REALLOC_NUM) {
-		  send_to_socket(new_w, pbuffer, sizeof(struct particle)*PARTICLE_REALLOC_NUM);
-		  l=0;
-		}
-	      }
-	    }
-	    if (l) send_to_socket(new_w, pbuffer, sizeof(struct particle)*l);
-	    if (bgroup_list) bgroup_list = check_realloc(bgroup_list, 0, "Freeing bgroups");
-	  }
-	  else if (!strcmp(cmd, "wrkd")) {
-	    recv_from_socket(new_w, &w, sizeof(struct workunit_info));
-	    assert((w.num_particles+w.num_meta_p) >= 0);
-	    fofs = recv_and_alloc(new_w, fofs, sizeof(struct fof)*w.num_fofs);
-	    rhalos = recv_and_alloc(new_w, rhalos, sizeof(struct halo)*w.num_halos);
-	    ehi = recv_and_alloc(new_w, ehi, sizeof(struct extra_halo_info)*w.num_halos);
-	    parts = recv_and_alloc(new_w, parts, sizeof(struct particle)*(w.num_particles+w.num_meta_p));
-	    integrate_finished_workunit(&w, fofs, rhalos, ehi, parts);
-	  }
-	  close_rsocket(new_w);
-	}
-	else {
-	  if (send_workunit(new_w, &w, &fofs, &parts, &set_sizes, &bgroup_list,
-			    &no_more_work, chunk, bounds) ||
-	      (child == new_w)) {
-	    workers = check_realloc(workers, sizeof(int64_t)*(num_workers+1),
-				    "Allocating rockstar analysis FDs.");
-	    workers[num_workers] = new_w;
-	    num_workers++;
-	    if (CLIENT_DEBUG) fprintf(stderr, "Got new worker (chunk %"PRId64"; wchunk %"PRId64")\n", chunk, worker_chunk);
-	  } else {
-	    close_rsocket(new_w);
-	  }
-	}
+        new_w = accept_connection(s,NULL,NULL);
+        recv_from_socket(new_w, &worker_chunk, sizeof(int64_t));
+        if (worker_chunk == chunk) {
+          assert(child < 0);
+          child = new_w;
+          child_has_connected = 1;
+        }
+        if (worker_chunk == -1) {
+          if (recv_from_socket(new_w, cmd, 4) <= 0) {
+            network_io_err(c);
+            for (j=0; j<num_workers; j++) close_rsocket(workers[j]);
+            num_workers = 0;
+            break;
+          }
+          if (!strcmp(cmd, "part")) {
+            int64_t num_groups;
+            recv_from_socket(new_w, &num_groups, sizeof(int64_t));
+            bgroup_list = recv_and_alloc(new_w, NULL, num_groups*sizeof(struct bgroup));
+            send_to_socket(new_w, bounds, sizeof(float)*6);
+            if (!pbuffer) pbuffer = check_realloc(NULL, sizeof(struct particle)*PARTICLE_REALLOC_NUM, "Particle buffer");
+            int64_t k = 0, l = 0;
+            struct fof tf;
+            for (j=0; j<num_groups; j++) {
+              assert(bgroup_list[j].chunk == chunk);
+              fof_of_id(bgroup_list[j].id, &tf);
+              assert(tf.num_p == bgroup_list[j].num_p);
+              for (k=0; k<tf.num_p; k++) {
+                pbuffer[l] = tf.particles[k];
+                l++;
+                if (l==PARTICLE_REALLOC_NUM) {
+                  send_to_socket(new_w, pbuffer, sizeof(struct particle)*PARTICLE_REALLOC_NUM);
+                  l=0;
+                }
+              }
+            }
+            if (l) send_to_socket(new_w, pbuffer, sizeof(struct particle)*l);
+            if (bgroup_list) bgroup_list = check_realloc(bgroup_list, 0, "Freeing bgroups");
+          }
+          else if (!strcmp(cmd, "wrkd")) {
+            recv_from_socket(new_w, &w, sizeof(struct workunit_info));
+            assert((w.num_particles+w.num_meta_p) >= 0);
+            fofs = recv_and_alloc(new_w, fofs, sizeof(struct fof)*w.num_fofs);
+            rhalos = recv_and_alloc(new_w, rhalos, sizeof(struct halo)*w.num_halos);
+            ehi = recv_and_alloc(new_w, ehi, sizeof(struct extra_halo_info)*w.num_halos);
+            parts = recv_and_alloc(new_w, parts, sizeof(struct particle)*(w.num_particles+w.num_meta_p));
+            integrate_finished_workunit(&w, fofs, rhalos, ehi, parts);
+          }
+          close_rsocket(new_w);
+        }
+        else {
+          if (send_workunit(new_w, &w, &fofs, &parts, &set_sizes, &bgroup_list,
+                            &no_more_work, chunk, bounds) ||
+              (child == new_w)) {
+            workers = check_realloc(workers, sizeof(int64_t)*(num_workers+1),
+                                    "Allocating rockstar analysis FDs.");
+            workers[num_workers] = new_w;
+            num_workers++;
+            if (CLIENT_DEBUG) fprintf(stderr, "Got new worker (chunk %"PRId64"; wchunk %"PRId64")\n", chunk, worker_chunk);
+          } else {
+            close_rsocket(new_w);
+          }
+        }
       }
       else if (i==c) {
-	recv_from_socket(c, cmd, 4);
-	if (!strcmp(cmd, "fini")) {
-	  assert(child >= 0);
-	  send_to_socket(child, "fini", 4);
-	  close_connection(child, workers, &num_workers);
-	  child = -1;
-	  if (CLIENT_DEBUG) fprintf(stderr, "Told child to finish (chunk %"PRId64")\n", chunk);
-	}
-	else if (!strcmp(cmd, "work")) {
-	  assert(child >= 0);
-	  recv_from_socket(c, &id, sizeof(int64_t));
-	  address = recv_msg_nolength(c, address);
-	  port = recv_msg_nolength(c, port);
-	  send_to_socket(child, "work", 4);
-	  send_to_socket(child, &id, sizeof(int64_t));
-	  send_msg(child, address, strlen(address)+1);
-	  send_msg(child, port, strlen(port)+1);
-	  if (CLIENT_DEBUG) fprintf(stderr, "Child (%"PRId64") connecting to id %"PRId64"\n", chunk, id);
-	}
-	else if (!strcmp(cmd, "allc")) all_clear = 1;
-	else if (!strcmp(cmd, "outp")) {
-	  assert(no_more_work && !done);
-	  recv_from_socket(c, &id_offset, sizeof(int64_t));
-	  output_halos(id_offset, snap, chunk, bounds);
-	  done = 1;
-	  if (CLIENT_DEBUG) fprintf(stderr, "Finished (chunk %"PRId64")\n", chunk);
-	}
-	else if (!strcmp(cmd, "quit")) {
-	  exit(1);
-	}
-	else if (!strcmp(cmd, "err!")) {
-	  in_error_state = 1;
-	  for (j=0; j<num_workers; j++) close_rsocket(workers[j]);
-	  num_workers = 0;
-	  break;
-	}
-	else { fprintf(stderr, "[Error] Server protocol error dw (%s)!\n", cmd); exit(1); }
+        recv_from_socket(c, cmd, 4);
+        if (!strcmp(cmd, "fini")) {
+          assert(child >= 0);
+          send_to_socket(child, "fini", 4);
+          close_connection(child, workers, &num_workers);
+          child = -1;
+          if (CLIENT_DEBUG) fprintf(stderr, "Told child to finish (chunk %"PRId64")\n", chunk);
+        }
+        else if (!strcmp(cmd, "work")) {
+          assert(child >= 0);
+          recv_from_socket(c, &id, sizeof(int64_t));
+          address = recv_msg_nolength(c, address);
+          port = recv_msg_nolength(c, port);
+          send_to_socket(child, "work", 4);
+          send_to_socket(child, &id, sizeof(int64_t));
+          send_msg(child, address, strlen(address)+1);
+          send_msg(child, port, strlen(port)+1);
+          if (CLIENT_DEBUG) fprintf(stderr, "Child (%"PRId64") connecting to id %"PRId64"\n", chunk, id);
+        }
+        else if (!strcmp(cmd, "allc")) all_clear = 1;
+        else if (!strcmp(cmd, "outp")) {
+          assert(no_more_work && !done);
+          recv_from_socket(c, &id_offset, sizeof(int64_t));
+          output_halos(id_offset, snap, chunk, bounds);
+          done = 1;
+          if (CLIENT_DEBUG) fprintf(stderr, "Finished (chunk %"PRId64")\n", chunk);
+        }
+        else if (!strcmp(cmd, "quit")) {
+          exit(1);
+        }
+        else if (!strcmp(cmd, "err!")) {
+          in_error_state = 1;
+          for (j=0; j<num_workers; j++) close_rsocket(workers[j]);
+          num_workers = 0;
+          break;
+        }
+        else { fprintf(stderr, "[Error] Server protocol error dw (%s)!\n", cmd); exit(1); }
       }
       else {
-	if (recv_from_socket(i, cmd, 4) <= 0) {
-	  network_io_err(c);
-	  for (j=0; j<num_workers; j++) close_rsocket(workers[j]);
-	  num_workers = 0;
-	  break;
-	}
-	if (!strcmp(cmd, "wrku")) {
-	  if (!send_workunit(i, &w, &fofs, &parts, &set_sizes, &bgroup_list,
-			     &no_more_work, chunk, bounds) && 
-	      (child != i))
-	    close_connection(i, workers, &num_workers);
-	}
-	else if (!strcmp(cmd, "clos")) {
-	  close_connection(i, workers, &num_workers);
-	}
-	else if (!strcmp(cmd, "nmwk")) {
-	  assert(i == child);
-	  recv_from_socket(i, &id, sizeof(int64_t));
-	  send_to_socket_noconfirm(c, "nmwk", 4);
-	  send_to_socket_noconfirm(c, &id, sizeof(int64_t));
-	}
+        if (recv_from_socket(i, cmd, 4) <= 0) {
+          network_io_err(c);
+          for (j=0; j<num_workers; j++) close_rsocket(workers[j]);
+          num_workers = 0;
+          break;
+        }
+        if (!strcmp(cmd, "wrku")) {
+          if (!send_workunit(i, &w, &fofs, &parts, &set_sizes, &bgroup_list,
+                             &no_more_work, chunk, bounds) &&
+              (child != i))
+            close_connection(i, workers, &num_workers);
+        }
+        else if (!strcmp(cmd, "clos")) {
+          close_connection(i, workers, &num_workers);
+        }
+        else if (!strcmp(cmd, "nmwk")) {
+          assert(i == child);
+          recv_from_socket(i, &id, sizeof(int64_t));
+          send_to_socket_noconfirm(c, "nmwk", 4);
+          send_to_socket_noconfirm(c, &id, sizeof(int64_t));
+        }
 
-	else { fprintf(stderr, "[Error] Client protocol error dw (%s)!\n", cmd); exit(1); }
+        else { fprintf(stderr, "[Error] Client protocol error dw (%s)!\n", cmd); exit(1); }
       }
     }
   }
@@ -1210,12 +1210,12 @@ void client(int64_t type) {
 
   clear_merger_tree();
   if (FORK_READERS_FROM_WRITERS) {
-    num_nodes = (FORK_PROCESSORS_PER_MACHINE) ? 
+    num_nodes = (FORK_PROCESSORS_PER_MACHINE) ?
       (NUM_WRITERS/FORK_PROCESSORS_PER_MACHINE) : NUM_WRITERS;
     readers = NUM_READERS/num_nodes + ((NUM_READERS%num_nodes) ? 1 : 0);
     for (i=0; i<readers; i++) {
       n = fork();
-      if (n==0) { type = READER_TYPE; break; } 
+      if (n==0) { type = READER_TYPE; break; }
       if (n<0) system_error("Couldn't fork reader process!");
     }
     if (i==readers) { type = WRITER_TYPE; }
@@ -1256,18 +1256,18 @@ void client(int64_t type) {
       type = WRITER_TYPE;
       hostname = recv_msg_nolength(c, hostname);
       for (i=0; i<10000 && s<0; i+=29) {
-	portnum = PARALLEL_IO_WRITER_PORT+i;
-	snprintf(port, 10, "%"PRId64, portnum);
-	s = listen_at_addr(hostname, port);
+        portnum = PARALLEL_IO_WRITER_PORT+i;
+        snprintf(port, 10, "%"PRId64, portnum);
+        s = listen_at_addr(hostname, port);
       }
       if (i>=10000) {
-	fprintf(stderr, "[Error] Couldn't start particle data server at %s:%d-%d!\n",
-		hostname, (int)PARALLEL_IO_WRITER_PORT, (int)portnum);
-	exit(1);
+        fprintf(stderr, "[Error] Couldn't start particle data server at %s:%d-%d!\n",
+                hostname, (int)PARALLEL_IO_WRITER_PORT, (int)portnum);
+        exit(1);
       }
       send_msg(c, port, strlen(port)+1);
       if (LIGHTCONE && strlen(LIGHTCONE_ALT_SNAPS)) {
-	memcpy(LIGHTCONE_ORIGIN, LIGHTCONE_ALT_ORIGIN, sizeof(double)*3);
+        memcpy(LIGHTCONE_ORIGIN, LIGHTCONE_ALT_ORIGIN, sizeof(double)*3);
       }
     }
 
@@ -1283,8 +1283,8 @@ void client(int64_t type) {
       chunk_info[0].address = recv_msg_nolength(c, NULL);
       chunk_info[0].port = chunk_info[0].address+strlen(chunk_info[0].address)+1;
       for (i=1; i<NUM_WRITERS; i++) {
-	chunk_info[i].address = chunk_info[i-1].port + strlen(chunk_info[i-1].port)+1;
-	chunk_info[i].port = chunk_info[i].address + strlen(chunk_info[i].address)+1;
+        chunk_info[i].address = chunk_info[i-1].port + strlen(chunk_info[i-1].port)+1;
+        chunk_info[i].port = chunk_info[i].address + strlen(chunk_info[i].address)+1;
       }
     }
 
@@ -1292,22 +1292,22 @@ void client(int64_t type) {
       assert(type == READER_TYPE);
       recv_from_socket(c, &block, sizeof(int64_t));
       if (LIGHTCONE && strlen(LIGHTCONE_ALT_SNAPS) && block >= (NUM_BLOCKS/2)) {
-	if (LIGHTCONE == 1)
-	  read_input_names(LIGHTCONE_ALT_SNAPS, &snapnames, &NUM_SNAPS);
-	LIGHTCONE = 2;
-	get_input_filename(buffer, 1024, snap, block-(NUM_BLOCKS/2));
+        if (LIGHTCONE == 1)
+          read_input_names(LIGHTCONE_ALT_SNAPS, &snapnames, &NUM_SNAPS);
+        LIGHTCONE = 2;
+        get_input_filename(buffer, 1024, snap, block-(NUM_BLOCKS/2));
       }
       else {
-	if (LIGHTCONE == 2) {
-	  LIGHTCONE = 1;
-	  read_input_names(SNAPSHOT_NAMES, &snapnames, &NUM_SNAPS);
-	}	  
-	get_input_filename(buffer, 1024, snap, block);
+        if (LIGHTCONE == 2) {
+          LIGHTCONE = 1;
+          read_input_names(SNAPSHOT_NAMES, &snapnames, &NUM_SNAPS);
+        }
+        get_input_filename(buffer, 1024, snap, block);
       }
       read_particles(buffer);
       if (!block) output_config(NULL);
     }
-      
+
     else if (!strcmp(cmd, "cnf?")) {
       assert(type == READER_TYPE);
       calc_particle_bounds(bounds);
@@ -1336,15 +1336,15 @@ void client(int64_t type) {
       recv_from_socket(c, &num_proj, sizeof(int64_t));
       reset_projection_count();
       if (num_proj) {
-	recv_from_socket(c, prq, sizeof(struct projection_request)*num_proj);
-	if (CLIENT_DEBUG) fprintf(stderr, "Doing client projections for block %"PRId64"\n", block);
-	do_projections();
-	if (CLIENT_DEBUG) fprintf(stderr, "Done with client projections for block %"PRId64"\n", block);
+        recv_from_socket(c, prq, sizeof(struct projection_request)*num_proj);
+        if (CLIENT_DEBUG) fprintf(stderr, "Doing client projections for block %"PRId64"\n", block);
+        do_projections();
+        if (CLIENT_DEBUG) fprintf(stderr, "Done with client projections for block %"PRId64"\n", block);
       }
       send_to_socket(c, "cprj", 4);
       send_to_socket(c, &num_proj, sizeof(int64_t));
       for (i=0; i<num_proj; i++)
-	send_to_socket(c, prj+i, sizeof(struct projection));
+        send_to_socket(c, prj+i, sizeof(struct projection));
     }
 
     else if (!strcmp(cmd, "bnds")) {
@@ -1373,12 +1373,12 @@ void client(int64_t type) {
       assert(type == WRITER_TYPE);
       recv_from_socket(c, &chunk, sizeof(int64_t));
       if (EXTRA_PROFILING && !profile_out) {
-	snprintf(buffer, 1024, "%s/profiling", OUTBASE); 
-	mkdir(buffer, 0777);
-	snprintf(buffer, 1024, "%s/profiling/profile.%"PRId64, OUTBASE, chunk); 
-	profile_out = check_fopen(buffer, "w"); //Truncate
-	fclose(profile_out);
-	profile_out = check_fopen(buffer, "a");
+        snprintf(buffer, 1024, "%s/profiling", OUTBASE);
+        mkdir(buffer, 0777);
+        snprintf(buffer, 1024, "%s/profiling/profile.%"PRId64, OUTBASE, chunk);
+        profile_out = check_fopen(buffer, "w"); //Truncate
+        fclose(profile_out);
+        profile_out = check_fopen(buffer, "a");
       }
       int64_t time_start = time(NULL);
       rockstar(bounds, 1);
@@ -1388,8 +1388,8 @@ void client(int64_t type) {
       int64_t time_end = time(NULL);
       if (CLIENT_DEBUG) fprintf(stderr, "Found %"PRId64" fofs in chunk %"PRId64"\n", num_all_fofs, chunk);
       if (profile_out) {
-	fprintf(profile_out, "[Prof] S%"PRId64",C%"PRId64" %"PRId64"s: %"PRId64" fofs, %"PRId64" particles, %"PRId64"s for conf.\n", snap, chunk, (time_middle-time_start), num_all_fofs, num_p, (time_end-time_middle));
-	fflush(profile_out);
+        fprintf(profile_out, "[Prof] S%"PRId64",C%"PRId64" %"PRId64"s: %"PRId64" fofs, %"PRId64" particles, %"PRId64"s for conf.\n", snap, chunk, (time_middle-time_start), num_all_fofs, num_p, (time_end-time_middle));
+        fflush(profile_out);
       }
     }
 
@@ -1418,8 +1418,8 @@ void client(int64_t type) {
     }
 
     else if (!strcmp(cmd, "pbds")) {
-      if (!p_bounds) 
-	check_realloc_s(p_bounds, sizeof(struct prev_bounds), NUM_WRITERS);
+      if (!p_bounds)
+        check_realloc_s(p_bounds, sizeof(struct prev_bounds), NUM_WRITERS);
       recv_from_socket(c, p_bounds, sizeof(struct prev_bounds)*NUM_WRITERS);
       prev_snap = snap;
     }
@@ -1438,8 +1438,8 @@ void client(int64_t type) {
       transfer_stuff(s,c,timestep);
       check_waitpid(n);
       if (in_error_state) {
-	network_error_cleanup();
-	continue;
+        network_error_cleanup();
+        continue;
       }
       if (timestep == 1) init_descendants();
       else if (timestep == 2) connect_particle_ids_to_halo_ids();
@@ -1460,8 +1460,8 @@ void client(int64_t type) {
       transfer_stuff(s,c,0);
       check_waitpid(n);
       if (in_error_state) {
-	network_error_cleanup();
-	continue;
+        network_error_cleanup();
+        continue;
       }
       clear_recipients();
       build_bgroup_links();
@@ -1476,8 +1476,8 @@ void client(int64_t type) {
       transfer_stuff(s,c,0);
       check_waitpid(n);
       if (in_error_state) {
-	network_error_cleanup();
-	continue;
+        network_error_cleanup();
+        continue;
       }
       convert_bgroups_to_metafofs();
       clear_bg_data();
@@ -1497,8 +1497,8 @@ void client(int64_t type) {
       transfer_stuff(s,c,0);
       check_waitpid(n);
       if (in_error_state) {
-	network_error_cleanup();
-	continue;
+        network_error_cleanup();
+        continue;
       }
       free_extended_particle_tree();
       clear_recipients();
@@ -1513,8 +1513,8 @@ void client(int64_t type) {
       assert(type == WRITER_TYPE);
       char *cat = NULL;
       int64_t cat_length, head_length, location;
-      cat = gen_merger_catalog(snap, chunk, halos1, head1.num_halos, 
-			       &cat_length, &head_length);
+      cat = gen_merger_catalog(snap, chunk, halos1, head1.num_halos,
+                               &cat_length, &head_length);
       send_to_socket_noconfirm(c, &head_length, sizeof(int64_t));
       send_to_socket_noconfirm(c, &cat_length, sizeof(int64_t));
       recv_from_socket(c, cmd, 4);
@@ -1527,7 +1527,7 @@ void client(int64_t type) {
     else if (!strcmp(cmd, "delb")) {
       assert(type == WRITER_TYPE);
       if (DELETE_BINARY_OUTPUT_AFTER_FINISHED)
-	delete_binary(snap, chunk);
+        delete_binary(snap, chunk);
     }
 
     else if (!strcmp(cmd, "free")) {
@@ -1540,16 +1540,16 @@ void client(int64_t type) {
     else if (!strcmp(cmd, "rpos")) {
       assert(type == WRITER_TYPE);
       snprintf(buffer, 1024, "%s %"PRId64" %"PRId64" %"PRId64" %"PRId64" '%s'",
-	      RUN_PARALLEL_ON_SUCCESS, snap, NUM_SNAPS, chunk, NUM_WRITERS,
-	      ROCKSTAR_CONFIG_FILENAME);
+              RUN_PARALLEL_ON_SUCCESS, snap, NUM_SNAPS, chunk, NUM_WRITERS,
+              ROCKSTAR_CONFIG_FILENAME);
       if (system(buffer) != 0) {
-	system_error("Running external parallel analysis process failed.");
-	send_to_socket(c, "fail", 4);
-	return;
+        system_error("Running external parallel analysis process failed.");
+        send_to_socket(c, "fail", 4);
+        return;
       }
       send_to_socket(c, "done", 4);
     }
-    
+
     else if (!strcmp(cmd, "quit")) {
       close_rsocket(c);
       if (hostname) free(hostname);

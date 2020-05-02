@@ -41,8 +41,8 @@ void read_input_names(char *filename, char ***stringnames, int64_t *num_names) {
     while (strlen(buffer) && buffer[strlen(buffer)-1]=='\n')
       buffer[strlen(buffer)-1] = 0;
     if (!strlen(buffer)) continue;
-    if (!(i%10)) names = check_realloc(names, sizeof(char *)*(i+10), 
-					   "Allocating snapshot names.");
+    if (!(i%10)) names = check_realloc(names, sizeof(char *)*(i+10),
+                                           "Allocating snapshot names.");
     names[i] = strdup(buffer);
     i++;
   }
@@ -65,20 +65,20 @@ void get_input_filename(char *buffer, int maxlen, int64_t snap, int64_t block) {
     if (FILENAME[i] != '<') { buffer[out]=FILENAME[i]; buffer[out+1]=0; }
     else {
       if (!strncmp(FILENAME+i, "<snap>", 6)) {
-	i+=5;
-	if (snapnames) snprintf(buffer+out, maxlen-out, "%s", snapnames[snap]);
-	else {
-	  if (!strncasecmp(FILE_FORMAT, "GADGET", 6) ||
-	      !strncasecmp(FILE_FORMAT, "LGADGET", 7) ||
-	      !strncasecmp(FILE_FORMAT, "AREPO", 5))
-	    snprintf(buffer+out, maxlen-out, "%03"PRId64, snap);
-	  else snprintf(buffer+out, maxlen-out, "%"PRId64, snap);
-	}
-      } 
+        i+=5;
+        if (snapnames) snprintf(buffer+out, maxlen-out, "%s", snapnames[snap]);
+        else {
+          if (!strncasecmp(FILE_FORMAT, "GADGET", 6) ||
+              !strncasecmp(FILE_FORMAT, "LGADGET", 7) ||
+              !strncasecmp(FILE_FORMAT, "AREPO", 5))
+            snprintf(buffer+out, maxlen-out, "%03"PRId64, snap);
+          else snprintf(buffer+out, maxlen-out, "%"PRId64, snap);
+        }
+      }
       else if (!strncmp(FILENAME+i, "<block>", 7)) {
-	i+=6;
-	if (blocknames) snprintf(buffer+out, maxlen-out,"%s",blocknames[block]);
-	else snprintf(buffer+out, maxlen-out, "%"PRId64, block);
+        i+=6;
+        if (blocknames) snprintf(buffer+out, maxlen-out,"%s",blocknames[block]);
+        else snprintf(buffer+out, maxlen-out, "%"PRId64, block);
       }
       else buffer[out] = FILENAME[i];
     }
@@ -105,11 +105,11 @@ void read_particles(char *filename) {
   double *origin, origin_offset[3] = {0};
   if (!strcasecmp(FILE_FORMAT, "ASCII")) load_particles(filename, &p, &num_p);
   else if (!strncasecmp(FILE_FORMAT, "GADGET", 6)
-	   || !strncasecmp(FILE_FORMAT, "LGADGET", 7)) {
+           || !strncasecmp(FILE_FORMAT, "LGADGET", 7)) {
     load_particles_gadget2(filename, &p, &num_p);
     gadget = 1;
   }
-  else if (!strncasecmp(FILE_FORMAT, "ART", 3)) 
+  else if (!strncasecmp(FILE_FORMAT, "ART", 3))
     load_particles_art(filename, &p, &num_p);
   else if (!strncasecmp(FILE_FORMAT, "INTERNAL", 8)) {
     load_particles_internal(filename, &p, &num_p);
@@ -140,9 +140,9 @@ void read_particles(char *filename) {
     for (i=p_start; i<num_p; i++) {
       for (j=0, ds=0; j<3; j++) { dx = p[i].pos[j]-LIMIT_CENTER[j]; ds+=dx*dx; }
       if (ds > LIMIT_RADIUS*LIMIT_RADIUS) {
-	num_p--;
-	p[i] = p[num_p];
-	i--;
+        num_p--;
+        p[i] = p[num_p];
+        i--;
       }
     }
   }
@@ -151,14 +151,14 @@ void read_particles(char *filename) {
     init_cosmology();
     if (strlen(LIGHTCONE_ALT_SNAPS)) {
       for (i=0; i<3; i++)
-	if (LIGHTCONE_ORIGIN[i] || LIGHTCONE_ALT_ORIGIN[i]) break;
+        if (LIGHTCONE_ORIGIN[i] || LIGHTCONE_ALT_ORIGIN[i]) break;
       if (i<3) { //Same box coordinates, different intended locations
-	if (LIGHTCONE == 1) {
-	  for (i=0; i<3; i++) origin_offset[i] = LIGHTCONE_ORIGIN[i] - 
-				LIGHTCONE_ALT_ORIGIN[i];
-	}
+        if (LIGHTCONE == 1) {
+          for (i=0; i<3; i++) origin_offset[i] = LIGHTCONE_ORIGIN[i] -
+                                LIGHTCONE_ALT_ORIGIN[i];
+        }
       } else { //Offset everything
-	for (i=0; i<3; i++) origin_offset[i] = -BOX_SIZE;
+        for (i=0; i<3; i++) origin_offset[i] = -BOX_SIZE;
       }
       BOX_SIZE *= 2.0;
     }
@@ -166,9 +166,9 @@ void read_particles(char *filename) {
     for (i=p_start; i<num_p; i++) {
       if (LIGHTCONE == 2) p[i].id = -p[i].id; //Make ids different
       for (j=0,dx=0; j<3; j++) {
-	ds = p[i].pos[j] - origin[j];
-	dx += ds*ds;
-	p[i].pos[j] -= origin_offset[j];
+        ds = p[i].pos[j] - origin[j];
+        dx += ds*ds;
+        p[i].pos[j] -= origin_offset[j];
       }
       if (!gadget) continue;
       dx = sqrt(dx);
@@ -201,12 +201,12 @@ int64_t print_ascii_header_info(FILE *output, float *bounds, int64_t np) {
   chars += fprintf(output, "#a = %f\n", SCALE_NOW);
   if (bounds)
     chars += fprintf(output, "#Bounds: (%f, %f, %f) - (%f, %f, %f)\n",
-		     bounds[0], bounds[1], bounds[2], 
-		     bounds[3], bounds[4], bounds[5]);
+                     bounds[0], bounds[1], bounds[2],
+                     bounds[3], bounds[4], bounds[5]);
   chars += fprintf(output, "#Om = %f; Ol = %f; h = %f\n", Om, Ol, h0);
   chars += fprintf(output, "#FOF linking length: %f\n", FOF_LINKING_LENGTH);
   chars += fprintf(output, "#Unbound Threshold: %f; FOF Refinement Threshold: %f\n",
-		   UNBOUND_THRESHOLD, FOF_FRACTION);
+                   UNBOUND_THRESHOLD, FOF_FRACTION);
   chars += fprintf(output, "#Particle mass: %.5e Msun/h\n", PARTICLE_MASS);
   chars += fprintf(output, "#Box size: %f Mpc/h\n", BOX_SIZE);
   if (np) chars+=fprintf(output, "#Total particles processed: %"PRId64"\n", np);
@@ -214,15 +214,15 @@ int64_t print_ascii_header_info(FILE *output, float *bounds, int64_t np) {
   if (STRICT_SO_MASSES && !np)
     chars += fprintf(output, "#Using Strict Spherical Overdensity Masses\n");
   chars += fprintf(output, "#Units: Masses in Msun / h\n"
-	  "#Units: Positions in Mpc / h (comoving)\n"
-	  "#Units: Velocities in km / s (physical, peculiar)\n"
-	  "#Units: Halo Distances, Lengths, and Radii in kpc / h (comoving)\n"
-	  "#Units: Angular Momenta in (Msun/h) * (Mpc/h) * km/s (physical)\n"
-	  "#Units: Spins are dimensionless\n");
+          "#Units: Positions in Mpc / h (comoving)\n"
+          "#Units: Velocities in km / s (physical, peculiar)\n"
+          "#Units: Halo Distances, Lengths, and Radii in kpc / h (comoving)\n"
+          "#Units: Angular Momenta in (Msun/h) * (Mpc/h) * km/s (physical)\n"
+          "#Units: Spins are dimensionless\n");
   if (np)
     chars += fprintf(output, "#Units: Total energy in (Msun/h)*(km/s)^2"
-		     " (physical)\n"
-	    "#Note: idx, i_so, and i_ph are internal debugging quantities\n");
+                     " (physical)\n"
+            "#Note: idx, i_so, and i_ph are internal debugging quantities\n");
   chars += fprintf(output, "#Np is an internal debugging quantity.\n");
   chars += fprintf(output, "#Rockstar Version: %s\n", ROCKSTAR_VERSION);
   return chars;
@@ -243,18 +243,18 @@ void output_ascii(int64_t id_offset, int64_t snap, int64_t chunk, float *bounds)
     if (!_should_print(halos+i, bounds)) continue;
     th = halos+i;
     fprintf(output, "%"PRId64" %"PRId64" %.3e %.3e"
-	    " %f %f %f %f %f %f %f %f %f %f %g %g %g %g %g %f %f %f %f %f %f %"PRId64" %e %e %e %e %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %e %e %f %"PRId64" %"PRId64" %"PRId64" %"PRId64" %f\n", id+id_offset,
-	    th->num_p, th->m, th->mgrav, th->r,	th->vmax, th->rvmax, th->vrms,
-	    th->pos[0], th->pos[1], th->pos[2], th->pos[3], th->pos[4],
-	    th->pos[5], th->J[0], th->J[1], th->J[2], th->energy, th->spin,
-	    sqrt(th->min_pos_err), sqrt(th->min_vel_err), th->bulkvel[0],
-	    th->bulkvel[1], th->bulkvel[2], sqrt(th->min_bulkvel_err),
-	    th->n_core, th->alt_m[0], th->alt_m[1], th->alt_m[2], th->alt_m[3], 
-	    th->Xoff, th->Voff, th->bullock_spin, th->b_to_a, th->c_to_a,
-	    th->A[0], th->A[1], th->A[2], th->b_to_a2, th->c_to_a2,
-	    th->A2[0], th->A2[1], th->A2[2], th->rs, th->klypin_rs, th->kin_to_pot,
-	    th->m_pe_b, th->m_pe_d, th->halfmass_radius,
-	    i, extra_info[i].sub_of, extra_info[i].ph, th->num_child_particles, extra_info[i].max_metric);
+            " %f %f %f %f %f %f %f %f %f %f %g %g %g %g %g %f %f %f %f %f %f %"PRId64" %e %e %e %e %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %e %e %f %"PRId64" %"PRId64" %"PRId64" %"PRId64" %f\n", id+id_offset,
+            th->num_p, th->m, th->mgrav, th->r,        th->vmax, th->rvmax, th->vrms,
+            th->pos[0], th->pos[1], th->pos[2], th->pos[3], th->pos[4],
+            th->pos[5], th->J[0], th->J[1], th->J[2], th->energy, th->spin,
+            sqrt(th->min_pos_err), sqrt(th->min_vel_err), th->bulkvel[0],
+            th->bulkvel[1], th->bulkvel[2], sqrt(th->min_bulkvel_err),
+            th->n_core, th->alt_m[0], th->alt_m[1], th->alt_m[2], th->alt_m[3],
+            th->Xoff, th->Voff, th->bullock_spin, th->b_to_a, th->c_to_a,
+            th->A[0], th->A[1], th->A[2], th->b_to_a2, th->c_to_a2,
+            th->A2[0], th->A2[1], th->A2[2], th->rs, th->klypin_rs, th->kin_to_pot,
+            th->m_pe_b, th->m_pe_d, th->halfmass_radius,
+            i, extra_info[i].sub_of, extra_info[i].ph, th->num_child_particles, extra_info[i].max_metric);
     id++;
   }
   fclose(output);
@@ -298,7 +298,7 @@ void output_full_particles(int64_t id_offset, int64_t snap, int64_t chunk, float
 
   print_ascii_header_info(output, bounds, num_p);
   fprintf(output, "#Halo table begins here:\n");
-  
+
   for (i=0; i<num_halos; i++) {
     th = halos+i;
     if (_should_print(th, bounds)) {
@@ -308,12 +308,12 @@ void output_full_particles(int64_t id_offset, int64_t snap, int64_t chunk, float
       th->id = -1;
       if (!UNFILTERED_HALO_OUTPUT) continue;
     }
-    
+
     fprintf(output, "#%"PRId64" %"PRId64" %"PRId64" %.3e %.3e"
-	    " %f %f %f %f %f %f %f %f %f %f %g %g %g %g %g\n", th->id, i,
-	    th->num_p, th->m, th->mgrav, th->r, th->vmax, th->rvmax, th->vrms,
-	    th->pos[0], th->pos[1], th->pos[2], th->pos[3], th->pos[4],
-	    th->pos[5], th->J[0], th->J[1], th->J[2], th->energy, th->spin);
+            " %f %f %f %f %f %f %f %f %f %f %g %g %g %g %g\n", th->id, i,
+            th->num_p, th->m, th->mgrav, th->r, th->vmax, th->rvmax, th->vrms,
+            th->pos[0], th->pos[1], th->pos[2], th->pos[3], th->pos[4],
+            th->pos[5], th->J[0], th->J[1], th->J[2], th->energy, th->spin);
   }
 
   fprintf(output, "#Particle table begins here:\n");
@@ -349,7 +349,7 @@ void output_halos(int64_t id_offset, int64_t snap, int64_t chunk, float *bounds)
     output_full_particles(id_offset, snap, chunk, bounds);
 
   if (DUMP_PARTICLES[0] && (chunk >= DUMP_PARTICLES[1] &&
-			    chunk <= DUMP_PARTICLES[2]))
+                            chunk <= DUMP_PARTICLES[2]))
     output_particles_internal(snap, chunk, 1);
 
   if (WEAK_LENSING_FRACTION > 0)
@@ -371,11 +371,11 @@ char *gen_merger_catalog(int64_t snap, int64_t chunk, struct halo *halos, int64_
     snprintf(buffer, 1024, "%s/out_%"PRId64".list", OUTBASE, snap);
     output = check_fopen(buffer, "w");
     hchars += fprintf(output, "#ID DescID M%s Vmax Vrms R%s Rs Np X Y Z VX VY VZ JX JY JZ Spin rs_klypin M%s_all M%s M%s M%s M%s Xoff Voff spin_bullock b_to_a c_to_a A[x] A[y] A[z] b_to_a(%s) c_to_a(%s) A[x](%s) A[y](%s) A[z](%s) T/|U| M_pe_Behroozi M_pe_Diemer Halfmass_Radius\n",
-		      MASS_DEFINITION, MASS_DEFINITION, MASS_DEFINITION, MASS_DEFINITION2, MASS_DEFINITION3, MASS_DEFINITION4, MASS_DEFINITION5, MASS_DEFINITION4, MASS_DEFINITION4, MASS_DEFINITION4, MASS_DEFINITION4, MASS_DEFINITION4);
+                      MASS_DEFINITION, MASS_DEFINITION, MASS_DEFINITION, MASS_DEFINITION2, MASS_DEFINITION3, MASS_DEFINITION4, MASS_DEFINITION5, MASS_DEFINITION4, MASS_DEFINITION4, MASS_DEFINITION4, MASS_DEFINITION4, MASS_DEFINITION4);
     hchars += print_ascii_header_info(output, NULL, 0);
     fclose(output);
   }
-  
+
   for (i=0; i<num_halos; i++) {
     if (chars + 1024 > chars_a) {
       chars_a = chars + 10000;
@@ -386,16 +386,16 @@ char *gen_merger_catalog(int64_t snap, int64_t chunk, struct halo *halos, int64_
     if (LIGHTCONE) for (j=0; j<3; j++) th->pos[j] -= LIGHTCONE_ORIGIN[j];
     m = (BOUND_PROPS) ? th->mgrav : th->m;
     chars += snprintf(cur_pos, 1024, "%"PRId64" %"PRId64" %.4e %.2f %.2f %.3f %.3f %"PRId64" %.5f "
-		      "%.5f %.5f %.2f %.2f %.2f %.3e %.3e %.3e %.5f %.5f %.4e %.4e %.4e %.4e %.4e "
-		      "%.5f %.2f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.4f %.3e %.3e %.3f\n",
-	    th->id, th->desc, m, th->vmax, th->vrms, th->r, th->rs,
-	    th->num_p, th->pos[0], th->pos[1], th->pos[2], th->pos[3],
-	    th->pos[4], th->pos[5], th->J[0], th->J[1], th->J[2], th->spin,
-	    th->klypin_rs, th->m, th->alt_m[0], th->alt_m[1], th->alt_m[2],
-	    th->alt_m[3], th->Xoff, th->Voff, th->bullock_spin, th->b_to_a,
-	    th->c_to_a, th->A[0], th->A[1], th->A[2], th->b_to_a2, th->c_to_a2,
-	    th->A2[0], th->A2[1], th->A2[2], th->kin_to_pot, 
-	    th->m_pe_b, th->m_pe_d, th->halfmass_radius);
+                      "%.5f %.5f %.2f %.2f %.2f %.3e %.3e %.3e %.5f %.5f %.4e %.4e %.4e %.4e %.4e "
+                      "%.5f %.2f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.4f %.3e %.3e %.3f\n",
+            th->id, th->desc, m, th->vmax, th->vrms, th->r, th->rs,
+            th->num_p, th->pos[0], th->pos[1], th->pos[2], th->pos[3],
+            th->pos[4], th->pos[5], th->J[0], th->J[1], th->J[2], th->spin,
+            th->klypin_rs, th->m, th->alt_m[0], th->alt_m[1], th->alt_m[2],
+            th->alt_m[3], th->Xoff, th->Voff, th->bullock_spin, th->b_to_a,
+            th->c_to_a, th->A[0], th->A[1], th->A[2], th->b_to_a2, th->c_to_a2,
+            th->A2[0], th->A2[1], th->A2[2], th->kin_to_pot,
+            th->m_pe_b, th->m_pe_d, th->halfmass_radius);
   }
   *cat_length = chars;
   *header_length = hchars;

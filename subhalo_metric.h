@@ -14,8 +14,8 @@ struct halo *find_best_parent(struct halo *h, struct halo *biggest_halo);
 float calc_particle_dist(struct halo *h, struct particle *part);
 float _calc_halo_dist(struct halo *h1, struct halo *h2);
 void free_subtree();
-struct halo_metric **find_children(struct halo *h, struct halo *parent, 
-				   float r, int64_t *num_children);
+struct halo_metric **find_children(struct halo *h, struct halo *parent,
+                                   float r, int64_t *num_children);
 
 
 #endif /* _SUBHALO_METRIC_H_ */

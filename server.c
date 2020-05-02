@@ -83,14 +83,14 @@ void accept_clients(int64_t s) {
     }
 
     recv_from_socket(c, cmd, 4);
-    if ((num_readers < NUM_READERS) && 
-	(!strcmp(cmd, "read") || !strcmp(cmd, "rdwr"))) {
+    if ((num_readers < NUM_READERS) &&
+        (!strcmp(cmd, "read") || !strcmp(cmd, "rdwr"))) {
       accepted_client = num_readers;
       num_readers++;
       send_to_socket_noconfirm(c, "read", 4);
     }
-    else if ((num_writers < NUM_WRITERS) && 
-	     (!strcmp(cmd, "writ") || !strcmp(cmd, "rdwr"))) {
+    else if ((num_writers < NUM_WRITERS) &&
+             (!strcmp(cmd, "writ") || !strcmp(cmd, "rdwr"))) {
       accepted_client = NUM_READERS + num_writers;
       send_to_socket_noconfirm(c, "writ", 4);
       num_writers++;
@@ -196,8 +196,8 @@ int sort_by_address(const void *a, const void *b) {
 
 void sort_clients() {
   qsort(clients, NUM_READERS, sizeof(struct client_info), sort_by_address);
-  qsort(clients+NUM_READERS, NUM_WRITERS, 
-	sizeof(struct client_info), sort_by_address);
+  qsort(clients+NUM_READERS, NUM_WRITERS,
+        sizeof(struct client_info), sort_by_address);
 }
 
 void transmit_client_info() {
@@ -207,7 +207,7 @@ void transmit_client_info() {
     address_length += strlen(clients[i].serv_port)+1;
   }
   char *client_addresses = check_realloc(NULL, sizeof(char)*address_length,
-					 "Client addresses and ports");
+                                         "Client addresses and ports");
   char *address_p = client_addresses;
   for_writers(i) {
     strcpy(address_p, clients[i].address);
@@ -239,7 +239,7 @@ void read_blocks(int64_t snap)
     }
   }
   timed_output("Reading %"PRId64" blocks for snapshot %"PRId64"...\n",
-	  NUM_BLOCKS, snap);
+          NUM_BLOCKS, snap);
 }
 
 #include "load_balance.c"
@@ -265,7 +265,7 @@ void decide_boundaries() {
     recv_from_socket(clients[reader].cs, &box_size, sizeof(float));
     BOX_SIZE = box_size;
     recv_from_socket(clients[reader].cs, clients[reader].bounds,
-		     sizeof(float)*6);
+                     sizeof(float)*6);
     recv_from_socket(clients[reader].cs, cmd, 4);
     protocol_check(cmd, "cnfg");
     recv_config(clients[reader].cs);
@@ -312,13 +312,13 @@ void transfer_data(int type, double overlap) {
   for (; i<max_i; i++) {
     for_writers(j) {
       rcptbounds = (type == DATA_HALOS) ? clients[j].bounds_prevsnap
-	: clients[j].bounds;
+        : clients[j].bounds;
       sndbounds = (type == DATA_HPARTICLES) ? clients[i].halo_bounds :
-	clients[i].bounds;
+        clients[i].bounds;
       if (j==i && type == DATA_BPARTICLES) continue;
       if (bounds_overlap(sndbounds, rcptbounds, bounds, overlap)) {
-	send_to_socket_noconfirm(clients[i].cs, send_cmd, 4);
-	send_bounds(i,j,bounds);
+        send_to_socket_noconfirm(clients[i].cs, send_cmd, 4);
+        send_bounds(i,j,bounds);
       }
     }
   }
@@ -384,7 +384,7 @@ void find_halos(int64_t snap) {
       timed_output("Generating BGC2 files/SO Masses...\n");
       command_writers("hbnds");
       for_writers(i) recv_from_socket(clients[i].cs, clients[i].halo_bounds,
-				      sizeof(float)*6);
+                                      sizeof(float)*6);
       transfer_data(DATA_HPARTICLES, 0);
       command_writers_and_confirm("bgc2");
       command_writers("done");
@@ -477,7 +477,7 @@ void do_merger_tree(int64_t snap) {
     for_writers(i) {
       send_to_socket_noconfirm(clients[i].cs, "pbds", 4);
       send_to_socket_noconfirm(clients[i].cs, p_bounds,
-			       sizeof(struct prev_bounds)*NUM_WRITERS);
+                               sizeof(struct prev_bounds)*NUM_WRITERS);
     }
 
     transfer_data(DATA_HALOS, OVERLAP_LENGTH);
@@ -509,16 +509,16 @@ int64_t setup_server_port(void) {
       s_address = get_interface_address(s_iface);
       if (s_address) addr_found = 1;
     }
-    
+
     if (!addr_found) {
       s_address = check_realloc(NULL, 1024, "Allocating hostname.");
       if (gethostname(s_address, 1023)<0) {
-	printf("Unable to get host address!\n");
-	exit(1);
+        printf("Unable to get host address!\n");
+        exit(1);
       }
     }
   }
-  
+
   if (!strcasecmp(s_port, "auto")) {
     auto_port = 1;
     s_port = check_realloc(NULL, sizeof(char)*10, "Allocating port.");
@@ -528,7 +528,7 @@ int64_t setup_server_port(void) {
       if (s>=0) break;
     }
   }
-  else 
+  else
     s = listen_at_addr(s_address, s_port);
 
   if (s<0) {
@@ -538,7 +538,7 @@ int64_t setup_server_port(void) {
     }
     else return -1; //Must be a client
   }
-  
+
   output_config("auto-rockstar.cfg");
   if (auto_addr) {
     free(s_address);
@@ -550,7 +550,7 @@ int64_t setup_server_port(void) {
   }
 
   return s;
-}  
+}
 
 int server(void) {
   char buffer[1024];
@@ -577,19 +577,19 @@ int server(void) {
     wait_for_all_ready(NUM_READERS, num_clients);
     if (!DO_MERGER_TREE_ONLY) {
       if (!PRELOAD_PARTICLES || reload_parts) {
-	read_blocks(snap);
-	reload_parts = 0;
+        read_blocks(snap);
+        reload_parts = 0;
       }
       decide_boundaries();
       transfer_particles();
       if (server_error_state) { reset_error(); reload_parts = 1; continue; }
-      if (PRELOAD_PARTICLES && (snap < NUM_SNAPS-1)) 
-	read_blocks(snap+1);
+      if (PRELOAD_PARTICLES && (snap < NUM_SNAPS-1))
+        read_blocks(snap+1);
       find_halos(snap);
       if (server_error_state) { reset_error(); reload_parts = 1; continue; }
     }
     if (((strcasecmp(OUTPUT_FORMAT, "ASCII") != 0) || TEMPORAL_HALO_FINDING)
-	&& !DUMP_PARTICLES[0] && !IGNORE_PARTICLE_IDS)
+        && !DUMP_PARTICLES[0] && !IGNORE_PARTICLE_IDS)
       do_merger_tree(snap);
     if (server_error_state) { reset_error(); reload_parts = 1; continue; }
 
@@ -601,15 +601,15 @@ int server(void) {
 
     if (strlen(RUN_ON_SUCCESS)) {
       if (snapnames && snapnames[snap])
-	snprintf(buffer, 1024, "%s %"PRId64" %s", 
-		 RUN_ON_SUCCESS, snap, snapnames[snap]);
+        snprintf(buffer, 1024, "%s %"PRId64" %s",
+                 RUN_ON_SUCCESS, snap, snapnames[snap]);
       else
-	snprintf(buffer, 1024, "%s %"PRId64" %"PRId64, 
-		 RUN_ON_SUCCESS, snap, snap);
+        snprintf(buffer, 1024, "%s %"PRId64" %"PRId64,
+                 RUN_ON_SUCCESS, snap, snap);
       n = fork();
       if (n<=0) {
-	if (system(buffer)!=0)
-	  fprintf(stderr, "[Warning] Post-analysis command \"%s\" exited abnormally.\n", buffer);
+        if (system(buffer)!=0)
+          fprintf(stderr, "[Warning] Post-analysis command \"%s\" exited abnormally.\n", buffer);
       }
       if (n==0) exit(0);
     }

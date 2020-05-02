@@ -48,7 +48,7 @@ void connect_particle_ids_to_halo_ids(void) {
     for (j=halos2[i].p_start; j<halos2[i].p_start+halos2[i].num_p; j++)
       ih_setint64(part2_halos, part2[j], halos2[i].id);
   }
-  part2 = check_realloc(part2, 0, "Freeing particle IDs.");  
+  part2 = check_realloc(part2, 0, "Freeing particle IDs.");
 }
 
 void calculate_descendants(void) {
@@ -60,7 +60,7 @@ void calculate_descendants(void) {
     if (halos1[i].num_p > max_p) {
       max_p = halos1[i].num_p;
       part1_halos = check_realloc(part1_halos, sizeof(int64_t)*max_p,
-				  "Allocating room for ID assignments.");
+                                  "Allocating room for ID assignments.");
     }
 
     k=0;
@@ -68,8 +68,8 @@ void calculate_descendants(void) {
     for (j=halos1[i].p_start; j<halos1[i].p_start+halos1[i].num_p; j++) {
       p2 = ih_getint64(part2_halos, part1[j]);
       if (p2 != IH_INVALID) {
-	part1_halos[k] = p2;
-	k++;
+        part1_halos[k] = p2;
+        k++;
       }
     }
 
@@ -79,11 +79,11 @@ void calculate_descendants(void) {
     last_desc = 0;
     for (j=1; j<k; j++) {
       if (part1_halos[j]!=part1_halos[last_desc]) {
-	if (j-last_desc > desc_maxp) {
-	  desc_maxp = j - last_desc;
-	  desc = part1_halos[last_desc];
-	}
-	last_desc = j;
+        if (j-last_desc > desc_maxp) {
+          desc_maxp = j - last_desc;
+          desc = part1_halos[last_desc];
+        }
+        last_desc = j;
       }
     }
     if (j - last_desc > desc_maxp) desc = part1_halos[last_desc];

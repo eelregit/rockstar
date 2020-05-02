@@ -54,7 +54,7 @@ Client analysis process:
 1) Request fof.
 2) If boundary fof, request gid lists in other chunks corresponding to the collected gids, lock requested gids. If another client with lower chunk number has asked for a lock, then refuse.  Otherwise, allow.
 3) Repeat with the new gids.
-4) Ask for lock on particles from each chunk.  
+4) Ask for lock on particles from each chunk.
 5) Transfer locked particles
 6) Run analysis
 7) Sort particles into regular particles and boundary particles

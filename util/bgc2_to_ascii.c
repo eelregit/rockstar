@@ -13,7 +13,7 @@
 
 extern GROUP_DATA_RMPVMAX *gd;
 void load_bgc2_groups(char *filename, struct bgc2_header *hdr,
-		      GROUP_DATA_RMPVMAX **groups, int64_t *num_groups);
+                      GROUP_DATA_RMPVMAX **groups, int64_t *num_groups);
 
 int main(int argc, char **argv)
 {
@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     if (!strcmp("-s", argv[i])) { snap = atoi(argv[i+1]); i++; }
   }
   if (!did_config) do_config(NULL);
-  if (strlen(SNAPSHOT_NAMES)) 
+  if (strlen(SNAPSHOT_NAMES))
     read_input_names(SNAPSHOT_NAMES, &snapnames, &NUM_SNAPS);
   if (strlen(BLOCK_NAMES))
     read_input_names(BLOCK_NAMES, &blocknames, &NUM_BLOCKS);
@@ -40,13 +40,13 @@ int main(int argc, char **argv)
 
 
   hdrs = check_realloc(hdrs, BGC2_HEADER_SIZE*NUM_WRITERS,
-		       "Allocating BGC2 headers.");
+                       "Allocating BGC2 headers.");
   for (i=0; i<NUM_WRITERS; i++) {
     get_output_filename(buffer, 1024, snap, i, "bgc2");
     load_bgc2_groups(buffer, hdrs + i, &gd, &num_groups);
   }
   printf("#ID DescID M%s Vmax Vrms R%s Rs Np X Y Z VX VY VZ Parent_ID\n",
-	 MASS_DEFINITION, MASS_DEFINITION);
+         MASS_DEFINITION, MASS_DEFINITION);
   for (i=0; i<num_groups; i++) {
     printf("%"PRId64" -1 %.5g %.3f 0 %.3f 0 %"PRId64" %f %f %f %f %f %f %"PRId64"\n", gd[i].id, gd[i].mass, gd[i].vmax, gd[i].radius*1.0e3, gd[i].npart, gd[i].pos[0],  gd[i].pos[1],  gd[i].pos[2], gd[i].vel[0], gd[i].vel[1], gd[i].vel[2], gd[i].parent_id);
   }

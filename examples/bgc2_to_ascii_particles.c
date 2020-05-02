@@ -44,15 +44,15 @@ int main(int argc, char **argv) {
     for (; k<num_parts; k++) {
       if (k==halo_sub_k) is_sub=1;
       if (k==next_halo_k) {
-	is_sub=0;
-	j++;
-	next_halo_k = k+grps[j].npart;
-	halo_sub_k = k+grps[j].npart_self;
+        is_sub=0;
+        j++;
+        next_halo_k = k+grps[j].npart;
+        halo_sub_k = k+grps[j].npart_self;
       }
       printf("%f %f %f %f %f %f %"PRId64" %"PRId64" %"PRId64" %"PRId64"\n",
-	     parts[k].pos[0], parts[k].pos[1], parts[k].pos[2], 
-	     parts[k].vel[0], parts[k].vel[1], parts[k].vel[2], 
-	     parts[k].part_id, is_sub, grps[j].id, grps[j].parent_id);
+             parts[k].pos[0], parts[k].pos[1], parts[k].pos[2],
+             parts[k].vel[0], parts[k].vel[1], parts[k].vel[2],
+             parts[k].part_id, is_sub, grps[j].id, grps[j].parent_id);
     }
   }
   return 0;

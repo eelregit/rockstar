@@ -35,13 +35,13 @@ void read_hlist(char *filename, float *bounds) {
 
   SHORT_PARSETYPE;
   #define NUM_INPUTS 41
-  enum short_parsetype stypes[NUM_INPUTS] = 
+  enum short_parsetype stypes[NUM_INPUTS] =
     { D64, D64, F, F, F,  //  #id desc_id mvir vmax vrms
-      F, F, D64, F,       //  Rvir Rs Np x 
-      F, F, F, F, F,      // y z vx vy vz 
+      F, F, D64, F,       //  Rvir Rs Np x
+      F, F, F, F, F,      // y z vx vy vz
       F, F, F, F, F,      // JX JY JZ Spin rs_klypin
       F, F, F, F, F,      // M_all M1 M2 M3 M4
-      F, F, F, F, F,      // Xoff Voff spin_bullock b_to_a c_to_a 
+      F, F, F, F, F,      // Xoff Voff spin_bullock b_to_a c_to_a
       F, F, F, F, F,      // A[x] A[y] A[z] b_to_a500 c_to_a500
       F, F, F, F, F,      //  A2[x] A2[y] A2[z] T/|U| M_PE_Behroozi
       F, F                //M_PE_Diemer Halfmass_Radius
@@ -50,31 +50,31 @@ void read_hlist(char *filename, float *bounds) {
   enum parsetype types[NUM_INPUTS];
   void *data[NUM_INPUTS] = {&(h.id),
                             &(h.descid),
-			    &(h.mvir), &(h.vmax), &(h.vrms), &(h.rvir), &(h.rs), 
-			    &(h.np), 
-			    &(h.pos[0]), &(h.pos[1]), &(h.pos[2]), 
-			    &(h.vel[0]), &(h.vel[1]), &(h.vel[2]),
-			    &(h.J[0]), &(h.J[1]), &(h.J[2]), &(h.spin),
-			    &(h.klypin_rs), &(h.m_all), &(h.alt_m[0]), 
-			    &(h.alt_m[1]), &(h.alt_m[2]), &(h.alt_m[3]),
-			    &(h.Xoff), &(h.Voff), &(h.bullock_spin), 
-			    &(h.b_to_a), &(h.c_to_a), &(h.A[0]), 
+                            &(h.mvir), &(h.vmax), &(h.vrms), &(h.rvir), &(h.rs),
+                            &(h.np),
+                            &(h.pos[0]), &(h.pos[1]), &(h.pos[2]),
+                            &(h.vel[0]), &(h.vel[1]), &(h.vel[2]),
+                            &(h.J[0]), &(h.J[1]), &(h.J[2]), &(h.spin),
+                            &(h.klypin_rs), &(h.m_all), &(h.alt_m[0]),
+                            &(h.alt_m[1]), &(h.alt_m[2]), &(h.alt_m[3]),
+                            &(h.Xoff), &(h.Voff), &(h.bullock_spin),
+                            &(h.b_to_a), &(h.c_to_a), &(h.A[0]),
                             &(h.A[1]), &(h.A[2]), &(h.b_to_a2), &(h.c_to_a2),
                             &(h.A2[0]), &(h.A2[1]), &(h.A2[2]),
                             &(h.kin_to_pot),
                             &(h.m_pe_b), &(h.m_pe_d), &(h.halfmass_radius)};
-  
+
 
   for (n=0; n<NUM_INPUTS; n++) types[n] = stypes[n];
   input = check_fopen(filename, "r");
   while (fgets(buffer, 1024, input)) {
     if (buffer[0] == '#') {
       if (c==0) {
-	c=1;
-	buffer[strlen(buffer)-1] = 0;
-	printf("%s PID\n", buffer);
+        c=1;
+        buffer[strlen(buffer)-1] = 0;
+        printf("%s PID\n", buffer);
       } else {
-	printf("%s", buffer);
+        printf("%s", buffer);
       }
     }
     n = stringparse(buffer, data, (enum parsetype *)types, NUM_INPUTS);
@@ -82,20 +82,20 @@ void read_hlist(char *filename, float *bounds) {
     if (bounds) {
       float rvir = h.rvir/1.0e3; //in Mpc/h
       for (i=0; i<3; i++) {
-	if (((h.pos[i] + rvir < bounds[i]) && (h.pos[i] - rvir + BOX_SIZE > bounds[i+3])) ||
-	    ((h.pos[i] - rvir > bounds[i+3]) && (h.pos[i] + rvir - BOX_SIZE < bounds[i])))
-	  break;
+        if (((h.pos[i] + rvir < bounds[i]) && (h.pos[i] - rvir + BOX_SIZE > bounds[i+3])) ||
+            ((h.pos[i] - rvir > bounds[i+3]) && (h.pos[i] + rvir - BOX_SIZE < bounds[i])))
+          break;
       }
       if (i<3) continue;
     }
     if (!(all_halos.num_halos%3000))
       all_halos.halos = check_realloc(all_halos.halos, sizeof(struct halo)*(all_halos.num_halos+3000), "Allocating Halos.");
-   
+
     all_halos.halos[all_halos.num_halos] = h;
     all_halos.num_halos++;
   }
   fclose(input);
-  
+
   all_halos.halos = check_realloc(all_halos.halos, sizeof(struct halo)*all_halos.num_halos, "Allocating Halos.");
 
   for (n=0; n<all_halos.num_halos; n++) {
@@ -108,17 +108,17 @@ void read_hlist(char *filename, float *bounds) {
     struct halo *th = all_halos.halos + n;
     if (bounds) {
       for (i=0; i<3; i++)
-	if ((th->pos[i] < bounds[i]) || (th->pos[i] >= bounds[i+3])) break;
+        if ((th->pos[i] < bounds[i]) || (th->pos[i] >= bounds[i+3])) break;
       if (i<3) continue;
     }
     printf("%"PRId64" %"PRId64" %.3e %.2f %.2f %.3f %.3f %"PRId64" %.5f %.5f %.5f %.2f %.2f %.2f %.3e %.3e %.3e %.5f %.5f %.4e %.4e %.4e %.4e %.4e %.5f %.2f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.4f %.3e %.3e %.3f %"PRId64"\n",
-	   th->id, th->descid, th->mvir, th->vmax, th->vrms, th->rvir, th->rs,
-	   th->np, th->pos[0], th->pos[1], th->pos[2], th->vel[0], th->vel[1],
-	   th->vel[2], th->J[0], th->J[1], th->J[2], th->spin,
-	   th->klypin_rs, th->m_all, th->alt_m[0], th->alt_m[1], th->alt_m[2],
-	   th->alt_m[3], th->Xoff, th->Voff, th->bullock_spin, th->b_to_a,
-	   th->c_to_a, th->A[0], th->A[1], th->A[2], th->b_to_a2, th->c_to_a2,
-           th->A2[0], th->A2[1], th->A2[2], th->kin_to_pot, 
+           th->id, th->descid, th->mvir, th->vmax, th->vrms, th->rvir, th->rs,
+           th->np, th->pos[0], th->pos[1], th->pos[2], th->vel[0], th->vel[1],
+           th->vel[2], th->J[0], th->J[1], th->J[2], th->spin,
+           th->klypin_rs, th->m_all, th->alt_m[0], th->alt_m[1], th->alt_m[2],
+           th->alt_m[3], th->Xoff, th->Voff, th->bullock_spin, th->b_to_a,
+           th->c_to_a, th->A[0], th->A[1], th->A[2], th->b_to_a2, th->c_to_a2,
+           th->A2[0], th->A2[1], th->A2[2], th->kin_to_pot,
            th->m_pe_b, th->m_pe_d, th->halfmass_radius, th->pid);
   }
 }

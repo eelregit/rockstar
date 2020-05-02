@@ -17,9 +17,9 @@ static double H_CONV;
 void init_time_table(void) {
   double a;
   int64_t i;
-  
+
   H_CONV = HUBBLE_TIME_CONVERSION/h0;
-      
+
   for (i=STEPS; i>=0; --i) {
     a = MAXA*((double)i)/((double)STEPS);
     times[i] = exact_scale_to_time(a);
@@ -31,12 +31,12 @@ double inv_hubble_scaling(double a, void *extra_data) {
 }
 
 double exact_scale_to_time(double scale)
-{  
+{
   if (scale == 1.0) return 0.0;
   if (scale < 1e-30) scale = 1e-30;
   double tol = fabs(scale-1.0)*1e-7;
   if (tol>1e-7) tol = 1e-7;
-  return (adaptiveSimpsons(inv_hubble_scaling, NULL, 1.0, scale, tol, 20));  
+  return (adaptiveSimpsons(inv_hubble_scaling, NULL, 1.0, scale, tol, 20));
 }
 
 // Linearly interpolate between calculated values.
@@ -68,17 +68,17 @@ double _exact_time_to_scale(double t) {
   W0 = -1.0;
   WA = 0.0;
   init_time_table();
-  
+
   double exact_t0_conv = -1.0*exact_scale_to_time(0.0);
-  
+
   for (i=0; i<100; i++) {
     double a = _exact_time_to_scale(i/fact);
-    printf("a = %10f t = %10f exact func = %10f exact2 func = %10f interp func = %10f (frac error in time = %g)\n", 
-	   a, i/fact-exact_t0_conv, exact_scale_to_time(a), exact_scale_to_time(a), scale_to_time(a), scale_to_time(a)/(i/fact-exact_t0_conv)-1.0);
+    printf("a = %10f t = %10f exact func = %10f exact2 func = %10f interp func = %10f (frac error in time = %g)\n",
+           a, i/fact-exact_t0_conv, exact_scale_to_time(a), exact_scale_to_time(a), scale_to_time(a), scale_to_time(a)/(i/fact-exact_t0_conv)-1.0);
   }
 
   printf("%f\n", fact);
-  
+
   fprintf(stderr,"age of universe = %f\n",exact_t0_conv);
   fprintf(stderr,"scale(age of universe) = %f\n",_exact_time_to_scale(exact_t0_conv));
 }

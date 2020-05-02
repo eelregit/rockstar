@@ -22,8 +22,8 @@ void jacobi_decompose(double cov_matrix[][NUM_PARAMS], double *eigenvalues, doub
     max_col[i] = i+1;
     for (j=i+1; j<n; j++) {
       if (fabs(cov_matrix[i][j])>max) {
-	max_col[i] = j;
-	max = fabs(cov_matrix[i][j]);
+        max_col[i] = j;
+        max = fabs(cov_matrix[i][j]);
       }
     }
   }
@@ -54,8 +54,8 @@ void jacobi_decompose(double cov_matrix[][NUM_PARAMS], double *eigenvalues, doub
     max_row = 0;
     for (i=1; i<n-1; i++) {
       if (fabs(cov_matrix[i][max_col[i]])>max) {
-	max = fabs(cov_matrix[i][max_col[i]]);
-	max_row = i;
+        max = fabs(cov_matrix[i][max_col[i]]);
+        max_row = i;
       }
     }
     k = max_row; l = max_col[k];
@@ -75,40 +75,40 @@ void jacobi_decompose(double cov_matrix[][NUM_PARAMS], double *eigenvalues, doub
     }
 
     //Update eigenvalues
-#define UPDATE(x,y)							\
-    a = eigenvalues[x];							\
-    eigenvalues[x] += y;						\
+#define UPDATE(x,y)                                                        \
+    a = eigenvalues[x];                                                        \
+    eigenvalues[x] += y;                                                \
     if (changed[x] && (fabs(y) < 1e-6*fabs(eigenvalues[x]))) { /*Eigenvalue didn't change*/ \
-      changed[x]=0;							\
-      state--;								\
+      changed[x]=0;                                                        \
+      state--;                                                                \
     } else if (!changed[x] && (fabs(y) > 1e-6*fabs(eigenvalues[x]))) { /*Egval did change*/ \
-      changed[x] = 1;							\
-      state++;								\
+      changed[x] = 1;                                                        \
+      state++;                                                                \
     }
-      
+
     UPDATE(k, -t);
     UPDATE(l, t);
 
     //Update covariance matrix:
     cov_matrix[k][l] = 0;
 
-#define ROTATE(m,w,x,y,z,r)  /*Perform a Jacobi rotation*/	\
-      t = m[w][x]; u = m[y][z];					\
-      m[w][x] = t*c - s*u;					\
-      m[y][z] = s*t + c*u;				        \
-      if (r) {							\
-	if (fabs(m[w][x])>fabs(m[w][max_col[w]]))		\
-	  max_col[w] = x;					\
-	if (y < NUM_PARAMS && fabs(m[y][z])>fabs(m[y][max_col[y]])) \
-	  max_col[y] = z;					\
+#define ROTATE(m,w,x,y,z,r)  /*Perform a Jacobi rotation*/        \
+      t = m[w][x]; u = m[y][z];                                        \
+      m[w][x] = t*c - s*u;                                        \
+      m[y][z] = s*t + c*u;                                        \
+      if (r) {                                                        \
+        if (fabs(m[w][x])>fabs(m[w][max_col[w]]))                \
+          max_col[w] = x;                                        \
+        if (y < NUM_PARAMS && fabs(m[y][z])>fabs(m[y][max_col[y]])) \
+          max_col[y] = z;                                        \
       }
-    
+
 
     for (i=0; i<k; i++) { ROTATE(cov_matrix,i,k,i,l,1); }
     for (i=k+1; i<l; i++) { ROTATE(cov_matrix,k,i,i,l,1); }
     for (i=l+1; i<n; i++) { ROTATE(cov_matrix,k,i,l,i,1); }
     for (i=0; i<n; i++) { ROTATE(orth_matrix,k,i,l,i,0); }
-    
+
 #undef ROTATE
 #undef UPDATE
   }

@@ -70,7 +70,7 @@ void rockstar(float *bounds, int64_t manual_subs) {
     link_particle_to_fof(p+i, rockstar_res->num_points, rockstar_res->points);
     if (rockstar_res->num_points > FOF_SKIP_THRESH) {
       for (int64_t j=0; j<rockstar_res->num_points; j++)
-	BIT_SET(skip,(rockstar_res->points[j]-p));
+        BIT_SET(skip,(rockstar_res->points[j]-p));
       fast3tree_find_sphere(tree, rockstar_res, p[i].pos, 2.0*r);
       link_fof_to_fof(p+i, rockstar_res->num_points, rockstar_res->points);
     }
@@ -85,7 +85,7 @@ void rockstar(float *bounds, int64_t manual_subs) {
     fast3tree_free(&tree);
     num_bp = rockstar_res->num_points;
     bp = (struct bparticle *)check_realloc(bp, sizeof(struct bparticle)*num_bp,
-					   "boundary particles");
+                                           "boundary particles");
 
     for (i=0; i<rockstar_res->num_points; i++) {
       bp[i].id = rockstar_res->points[i]->id;
@@ -113,8 +113,8 @@ void rockstar(float *bounds, int64_t manual_subs) {
 
 void convert_bgroups_to_metafofs(void) {
   int64_t i, j=0, max_j, num_p_in_set;
-  bg_set_indices = check_realloc(bg_set_indices, sizeof(int64_t)*num_bg_sets, 
-				 "Allocating bg indices");
+  bg_set_indices = check_realloc(bg_set_indices, sizeof(int64_t)*num_bg_sets,
+                                 "Allocating bg indices");
   all_fofs = check_realloc(all_fofs, sizeof(struct fof)*(num_all_fofs + num_bg_sets), "Allocating metafofs");
   num_metafofs = num_bg_sets;
   struct fof mf;
@@ -130,7 +130,7 @@ void convert_bgroups_to_metafofs(void) {
   }
   num_all_fofs += num_metafofs;
   fof_order = check_realloc(fof_order, sizeof(int64_t)*(num_all_fofs-num_bfofs),
-			    "Allocating fof order");
+                            "Allocating fof order");
   for (i=0; i<(num_all_fofs-num_metafofs-num_bfofs); i++) fof_order[i] = i;
   for (; i<(num_all_fofs-num_bfofs); i++) fof_order[i] = i+num_bfofs;
   qsort(fof_order, num_all_fofs-num_bfofs, sizeof(int64_t), sort_fofs);
@@ -147,23 +147,23 @@ void find_unfinished_workunit(struct workunit_info *w, struct fof **fofs, struct
   for (; num_fofs_tosend>0 && (w->num_particles+w->num_meta_p < LARGE_FOF); num_fofs_tosend--) {
     if (!(w->num_fofs % 1000))
       tf = *fofs = check_realloc(*fofs, sizeof(struct fof)*(w->num_fofs+1000),
-				 "Allocating workunit fofs.");
+                                 "Allocating workunit fofs.");
     int64_t fofid_tosend = fof_order[num_fofs_tosend-1];
     tf[w->num_fofs] = all_fofs[fofid_tosend];
-    if (fofid_tosend < num_all_fofs-num_bfofs) 
+    if (fofid_tosend < num_all_fofs-num_bfofs)
       w->num_particles += tf[w->num_fofs].num_p;
     else {
       assert(!tf[w->num_fofs].particles);
       w->num_meta_p += tf[w->num_fofs].num_p;
       mf_id = fofid_tosend - (num_all_fofs - num_metafofs);
       if (!(w->num_meta_fofs % 1000))
-	*set_sizes = check_realloc(*set_sizes, sizeof(int64_t)*(w->num_meta_fofs+1000), "Allocating set_sizes.");
+        *set_sizes = check_realloc(*set_sizes, sizeof(int64_t)*(w->num_meta_fofs+1000), "Allocating set_sizes.");
       set_sizes[0][w->num_meta_fofs] = bg_set_sizes[mf_id];
       for (i=0; i<bg_set_sizes[mf_id]; i++) {
-	if (!(w->total_bg % 1000))
-	  *bgroup_list = check_realloc(*bgroup_list, sizeof(struct bgroup)*(w->total_bg+1000), "Allocating bgroups.");
-	bgroup_list[0][w->total_bg] = final_bg[bg_set_indices[mf_id]+i];
-	w->total_bg++;
+        if (!(w->total_bg % 1000))
+          *bgroup_list = check_realloc(*bgroup_list, sizeof(struct bgroup)*(w->total_bg+1000), "Allocating bgroups.");
+        bgroup_list[0][w->total_bg] = final_bg[bg_set_indices[mf_id]+i];
+        w->total_bg++;
       }
       w->num_meta_fofs++;
     }
@@ -176,7 +176,7 @@ void find_unfinished_workunit(struct workunit_info *w, struct fof **fofs, struct
     else *parts = NULL;
   } else {
     *parts = check_realloc(*parts, sizeof(struct particle)*w->num_particles,
-			 "Allocating workunit particles.");
+                         "Allocating workunit particles.");
     for (i=0; i<w->num_fofs; i++) {
       if (!tf[i].particles) continue;
       memcpy(*parts + np, p+(tf[i].particles-original_p), sizeof(struct particle)*tf[i].num_p);
@@ -193,7 +193,7 @@ void fof_of_id(int64_t id, struct fof *tf) {
 }
 
 void integrate_finished_workunit(struct workunit_info *w, struct fof *fofs, struct halo *h,
-				 struct extra_halo_info *ei, struct particle *parts) {
+                                 struct extra_halo_info *ei, struct particle *parts) {
   int64_t i, j=0, offset, np=0, np2 = w->num_particles, hstart = num_halos, max_np;
   int64_t num_add_p = 0, ignore_halos = 0;
   struct particle *next_new_p_loc;
@@ -218,14 +218,14 @@ void integrate_finished_workunit(struct workunit_info *w, struct fof *fofs, stru
       offset = fofs[i].particles - original_p;
       fofs[i].particles = p + offset;
       if (w->chunk == our_chunk)
-	memcpy(fofs[i].particles, parts + np, sizeof(struct particle)*fofs[i].num_p);
+        memcpy(fofs[i].particles, parts + np, sizeof(struct particle)*fofs[i].num_p);
       else ignore_halos = 1;
       offset = (fofs[i].particles - p) - np;
       np += fofs[i].num_p;
       max_np = np;
     }
     for (; (j < w->num_halos) && (h[j].p_start+h[j].num_p <= max_np)
-	   && (h[j].p_start >= (max_np - fofs[i].num_p)); j++) {
+           && (h[j].p_start >= (max_np - fofs[i].num_p)); j++) {
       if (ignore_halos) continue;
       add_new_halo();
       if (ei[j].child >= 0) ei[j].child += hstart;
@@ -254,25 +254,25 @@ void align_particles(struct fof f) {
   if (!BOX_SIZE || f.num_p < 2) return;
   for (j=0; j<3; j++) { bounds[j] = bounds[j+3] = f.particles[0].pos[j]; }
   for (i=1; i<f.num_p; i++) {
-    for (j=0; j<3; j++) { 
+    for (j=0; j<3; j++) {
       if (bounds[j]>f.particles[i].pos[j]) bounds[j]=f.particles[i].pos[j];
       if (bounds[j+3]<f.particles[i].pos[j]) bounds[j+3]=f.particles[i].pos[j];
     }
   }
   for (j=0; j<3; j++) {
     if (bounds[j] <= AVG_PARTICLE_SPACING*FOF_LINKING_LENGTH &&
-	bounds[j+3] >= (BOX_SIZE-AVG_PARTICLE_SPACING*FOF_LINKING_LENGTH)) {
+        bounds[j+3] >= (BOX_SIZE-AVG_PARTICLE_SPACING*FOF_LINKING_LENGTH)) {
       memset(counts, 0, sizeof(int64_t)*100);
       max_counts = (int64_t)((BOX_SIZE / (AVG_PARTICLE_SPACING*FOF_LINKING_LENGTH)));
       if (max_counts > 100) max_counts = 100;
       double multiple = max_counts / BOX_SIZE;
       for (i=0; i<f.num_p; i++)
-	counts[(int64_t)(f.particles[i].pos[j]*multiple)]++;
+        counts[(int64_t)(f.particles[i].pos[j]*multiple)]++;
       for (i=0; i<max_counts; i++) if (!counts[i]) break;
       double wrap_position = (i+0.5) * BOX_SIZE / max_counts;
       for (i=0; i<f.num_p; i++)
-	if (f.particles[i].pos[j] > wrap_position)
-	  f.particles[i].pos[j] -= BOX_SIZE;
+        if (f.particles[i].pos[j] > wrap_position)
+          f.particles[i].pos[j] -= BOX_SIZE;
     }
   }
 }
@@ -294,7 +294,7 @@ void do_workunit(struct workunit_info *w, struct fof *fofs) {
     else processed_parts2 += tmp.num_p;
   }
   assert((processed_parts == w->num_particles) &&
-	 (processed_parts2 == (w->num_meta_p+w->num_particles)));
+         (processed_parts2 == (w->num_meta_p+w->num_particles)));
 }
 
 void build_particle_tree(void) {
@@ -308,8 +308,8 @@ void build_particle_tree(void) {
   if (num_p<2) return;
   last_p = p+(num_p-1);
   for (i=num_p-2; i>=0; i--) {
-    if (!memcmp(p[i].pos, last_p->pos, sizeof(float)*6) || 
-	last_p->id == p[i].id) {
+    if (!memcmp(p[i].pos, last_p->pos, sizeof(float)*6) ||
+        last_p->id == p[i].id) {
       num_p--;
       p[i] = p[num_p];
       dup_particles++;
@@ -321,7 +321,7 @@ void build_particle_tree(void) {
     fast3tree_rebuild(tree, num_p, p);
     if (dup_particles > 0.0001*num_p)
       fprintf(stderr, "[Warning] %"PRId64" duplicate particles removed.\n",
-	      dup_particles);
+              dup_particles);
   }
 }
 

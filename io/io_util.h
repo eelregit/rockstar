@@ -13,5 +13,5 @@ size_t fread_fortran(void *ptr, size_t size, size_t nitems, FILE *stream, int sw
 size_t fwrite_fortran(void *ptr, size_t size, size_t nitems, FILE *stream);
 void skip_fortran(FILE *stream, int swap);
 void particle_range(int64_t total_p, int64_t block, int64_t num_blocks,
-		    int64_t *p_start, int64_t *to_read);
+                    int64_t *p_start, int64_t *to_read);
 #endif /* _IO_UTIL_H_ */

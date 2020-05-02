@@ -11,15 +11,15 @@
 
 struct inthash *new_inthash(void) {
   struct inthash *ih = check_realloc(NULL, sizeof(struct inthash),
-				       "Allocating inthash.");
+                                       "Allocating inthash.");
   int64_t i;
   memset(ih, 0, sizeof(struct inthash));
-  ih->hashnum = rand() + 
+  ih->hashnum = rand() +
     (((uint64_t)rand())<<(uint64_t)32) + (uint64_t)(rand());
   ih->hashwidth = 8;
   ih->num_buckets = (uint64_t)1 << ih->hashwidth;
   ih->buckets = check_realloc(NULL, sizeof(struct intbucket)*ih->num_buckets,
-			      "Allocating hash buckets.");
+                              "Allocating hash buckets.");
   memset(ih->buckets, 0, sizeof(struct intbucket)*ih->num_buckets);
   for (i=0; i<ih->num_buckets; i++) ih->buckets[i].key = IH_INVALID;
   if (!(ih->hashnum & 1)) ih->hashnum++;

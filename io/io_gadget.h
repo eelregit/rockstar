@@ -23,9 +23,9 @@ struct gadget_header {
   int32_t  flag_metals;
   int32_t  num_total_particles_hw[6]; /* High word of total particle number */
   int32_t  flag_entropy_ics;
-  char unused[GADGET_HEADER_SIZE - (sizeof(double)*12) - 
-	      (sizeof(int32_t)*13) - (sizeof(uint32_t)*12)];
-};  
+  char unused[GADGET_HEADER_SIZE - (sizeof(double)*12) -
+              (sizeof(int32_t)*13) - (sizeof(uint32_t)*12)];
+};
 
 void load_particles_gadget2(char *filename, struct particle **p, int64_t *num_p);
 

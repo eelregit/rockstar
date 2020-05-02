@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
     num_h = num_p = 0;
     load_full_particles(argv[i], &h, &num_h, &p, &num_p, bounds);
     printf("Scale factor: %f\n", SCALE_NOW);
-    printf("Bounds: (%f, %f, %f) - (%f, %f, %f)\n", bounds[0], bounds[1], 
-	   bounds[2], bounds[3], bounds[4], bounds[5]);
+    printf("Bounds: (%f, %f, %f) - (%f, %f, %f)\n", bounds[0], bounds[1],
+           bounds[2], bounds[3], bounds[4], bounds[5]);
     printf("Om = %f; Ol = %f; h0 = %f\n", Om, Ol, h0);
     printf("Particle mass: %e Msun/h\n", PARTICLE_MASS);
     printf("Num groups: %"PRId64"\n", num_h);
@@ -62,29 +62,29 @@ int int_id_compare(const void *a, const void *b) {
   return 0;
 }
 
-void load_full_particles(char *filename, struct halo **h, int64_t *num_h, 
-			 struct full_particle **p, int64_t *num_p, float *bnds) {
+void load_full_particles(char *filename, struct halo **h, int64_t *num_h,
+                         struct full_particle **p, int64_t *num_p, float *bnds) {
   FILE *input;
   int64_t i;
   char buffer[1024];
   struct halo the_h = {0};
   struct full_particle the_p;
   SHORT_PARSETYPE;
-  enum short_parsetype stypes_h[20] = 
+  enum short_parsetype stypes_h[20] =
     { D64, D64, D64, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F};
   enum parsetype types_h[20];
-  enum short_parsetype stypes_p[10] = 
+  enum short_parsetype stypes_p[10] =
     { F, F, F, F, F, F, D64, D64, D64, D64};
   enum parsetype types_p[10];
 
   void *data_h[20] = {&(the_h.id), &(the_h.flags), &(the_h.num_p), &(the_h.m),
-		      &(the_h.mgrav), &(the_h.r), &(the_h.vmax), &(the_h.rvmax),
-		      &(the_h.vrms), the_h.pos, the_h.pos+1, the_h.pos+2,
-		      the_h.pos+3, the_h.pos+4, the_h.pos+5, the_h.J,
-		      the_h.J+1, the_h.J+2, &(the_h.energy), &(the_h.spin)};
-  void *data_p[10] = {the_p.pos, the_p.pos+1, the_p.pos+2, 
-		      the_p.pos+3, the_p.pos+4, the_p.pos+5,
-		      &(the_p.id), &(the_p.a_hid), &(the_p.hid), &(the_p.ehid)};
+                      &(the_h.mgrav), &(the_h.r), &(the_h.vmax), &(the_h.rvmax),
+                      &(the_h.vrms), the_h.pos, the_h.pos+1, the_h.pos+2,
+                      the_h.pos+3, the_h.pos+4, the_h.pos+5, the_h.J,
+                      the_h.J+1, the_h.J+2, &(the_h.energy), &(the_h.spin)};
+  void *data_p[10] = {the_p.pos, the_p.pos+1, the_p.pos+2,
+                      the_p.pos+3, the_p.pos+4, the_p.pos+5,
+                      &(the_p.id), &(the_p.a_hid), &(the_p.hid), &(the_p.ehid)};
 
   input = check_fopen(filename, "r");
   for (i=0; i<20; i++) types_h[i] = stypes_h[i];
@@ -100,7 +100,7 @@ void load_full_particles(char *filename, struct halo **h, int64_t *num_h,
       PARTICLE_MASS = atof(buffer+16);
     if (!strncmp(buffer, "#Bounds: ", 9))
       sscanf(buffer, "#Bounds: (%f, %f, %f) - (%f, %f, %f)",
-	     bnds, bnds+1, bnds+2, bnds+3, bnds+4, bnds+5);
+             bnds, bnds+1, bnds+2, bnds+3, bnds+4, bnds+5);
     if (!strncmp(buffer, "#Box size: ", 11))
       BOX_SIZE = atof(buffer+11);
   }
@@ -112,7 +112,7 @@ void load_full_particles(char *filename, struct halo **h, int64_t *num_h,
     if (i < 20) continue;
     if (!((*num_h)%1000)) {
       *h = check_realloc(*h, sizeof(struct halo)*((*num_h)+1000),
-			 "Allocating halos");
+                         "Allocating halos");
     }
     (*h)[*num_h] = the_h;
     *num_h = *num_h + 1;
@@ -127,7 +127,7 @@ void load_full_particles(char *filename, struct halo **h, int64_t *num_h,
     if (i < 10) continue;
     if (!((*num_p)%1000)) {
       *p = check_realloc(*p, sizeof(struct full_particle)*((*num_p)+1000),
-			 "Allocating particles");
+                         "Allocating particles");
     }
     (*p)[*num_p] = the_p;
     *num_p = *num_p + 1;

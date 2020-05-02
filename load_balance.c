@@ -35,7 +35,7 @@ void divide_projection(struct projection *proj, int64_t pieces, float *places)
     for (; n<pieces; n++)
       places[n] = places[n-1] + (BOX_SIZE-places[n-1])/(double)(pieces-n+1);
   }
-} 
+}
 
 void sort_chunks(void) {
   int64_t tmp;
@@ -47,7 +47,7 @@ void sort_chunks(void) {
 }
 
 void populate_bounds(int64_t pos, float *oldbounds, float *newbounds,
-		     float new_min, float new_max) {
+                     float new_min, float new_max) {
   for (int64_t i=0; i<6; i++) {
     if      ((i%3)< pos) newbounds[i] = oldbounds[i];
     else if ((i%3)==pos) newbounds[i] = (i<3) ? new_min : new_max;
@@ -60,27 +60,27 @@ void send_projection_requests(struct projection *pr, int64_t num_requests) {
   float bounds[6];
   struct projection_request *prq = NULL;
   prq = check_realloc(prq, sizeof(struct projection_request)*num_requests,
-		      "Allocating projection requests.");
+                      "Allocating projection requests.");
   for (i=0; i<NUM_READERS; i++) {
     num_to_send = 0;
     for (j=0; j<num_requests; j++)
       if (bounds_overlap(clients[i].bounds, pr[j].bounds, bounds, 0)) {
-	prq[num_to_send].dir = pr[j].dir;
-	prq[num_to_send].id = pr[j].id;
-	memcpy(prq[num_to_send].bounds, pr[j].bounds, sizeof(float)*6);
-	num_to_send++;
+        prq[num_to_send].dir = pr[j].dir;
+        prq[num_to_send].id = pr[j].id;
+        memcpy(prq[num_to_send].bounds, pr[j].bounds, sizeof(float)*6);
+        num_to_send++;
       }
     send_to_socket_noconfirm(clients[i].cs, "proj", 4);
     send_to_socket_noconfirm(clients[i].cs, &num_to_send, sizeof(int64_t));
     if (num_to_send)
       send_to_socket_noconfirm(clients[i].cs, prq,
-			       sizeof(struct projection_request)*num_to_send);
+                               sizeof(struct projection_request)*num_to_send);
   }
   free(prq);
 }
 
 void accumulate_projections(struct projection *pr, int64_t start,
-			    int64_t num_requests) {
+                            int64_t num_requests) {
   int64_t max_requests = 1 + (1 + chunks[1])*chunks[0];
   int64_t i, j, k, num_to_recv;
   char cmd[5] = {0};
@@ -97,7 +97,7 @@ void accumulate_projections(struct projection *pr, int64_t start,
       recv_from_socket(clients[i].cs, &cproj, sizeof(struct projection));
       assert((cproj.id >= start) && (cproj.id < (start+num_requests)));
       for (k=0; k<PROJECTION_SIZE; k++)
-	pr[cproj.id].data[k] += cproj.data[k];
+        pr[cproj.id].data[k] += cproj.data[k];
     }
   }
 }
@@ -118,7 +118,7 @@ void decide_chunks_for_volume_balance() {
     memcpy(clients[NUM_READERS+n].bounds, bounds, sizeof(float)*6);
     send_to_socket_noconfirm(clients[NUM_READERS+n].cs, "bnds", 4);
     send_to_socket_noconfirm(clients[NUM_READERS+n].cs,
-			     clients[NUM_READERS+n].bounds, sizeof(float)*6);
+                             clients[NUM_READERS+n].bounds, sizeof(float)*6);
   }
 }
 
@@ -128,41 +128,41 @@ void decide_chunks_by_script() {
   int port, pid;
   float bounds[6];
   char buffer[1024];
-  
+
   script = check_rw_socket(LOAD_BALANCE_SCRIPT, &pid);
   check_fprintf(script, "%"PRId64" #Num writers\n", NUM_WRITERS);
   check_fprintf(script,"%"PRId64" %"PRId64" %"PRId64" #Recommended divisions\n",
-		chunks[0], chunks[1], chunks[2]);
+                chunks[0], chunks[1], chunks[2]);
   check_fprintf(script, "%f #Box size (comoving Mpc/h)\n", BOX_SIZE);
   check_fprintf(script, "%f #Current scale factor\n", SCALE_NOW);
   check_fprintf(script, "#Format: ID IP_Address Port\n");
   for (n=0; n<NUM_WRITERS; n++)
     check_fprintf(script, "%"PRId64" %s %d\n", n,clients[n+NUM_READERS].address,
-		  clients[n+NUM_READERS].port);
+                  clients[n+NUM_READERS].port);
   check_fprintf(script, "#Expected Return Format: ID IP_Address Port min_x min_y min_z max_x max_y max_z\n");
   fflush(script);
   for (n=0; n<NUM_WRITERS; n++) {
     check_fgets(buffer, 1024, script);
     if (sscanf(buffer, "%"SCNd64" %*s %d %f %f %f %f %f %f", &i, &port,
-	       bounds, bounds+1, bounds+2, bounds+3, bounds+4, bounds+5)<8 ||
-	(i != n) || (port != clients[n+NUM_READERS].port)) {
+               bounds, bounds+1, bounds+2, bounds+3, bounds+4, bounds+5)<8 ||
+        (i != n) || (port != clients[n+NUM_READERS].port)) {
       fprintf(stderr, "[Error] Received invalid format from load balance script!\n");
       fprintf(stderr, "[Error] Offending line: %s", buffer);
       fprintf(stderr, "[Error] Expected: %"PRId64" %s %d min_x min_y min_z max_x max_y max_z",
-	      n, clients[n+NUM_READERS].address, clients[n+NUM_READERS].port);
+              n, clients[n+NUM_READERS].address, clients[n+NUM_READERS].port);
       exit(1);
     }
     for (i=0; i<6; i++)
       if (bounds[i]<0 || bounds[i] > BOX_SIZE) {
-	fprintf(stderr, "[Error] Received invalid format from load balance script!\n");
-	fprintf(stderr, "[Error] Offending line: %s", buffer);
-	fprintf(stderr, "[Error] Bounds must be within the range 0 to %f\n", BOX_SIZE);
-	exit(1);
+        fprintf(stderr, "[Error] Received invalid format from load balance script!\n");
+        fprintf(stderr, "[Error] Offending line: %s", buffer);
+        fprintf(stderr, "[Error] Bounds must be within the range 0 to %f\n", BOX_SIZE);
+        exit(1);
       }
     memcpy(clients[NUM_READERS+n].bounds, bounds, sizeof(float)*6);
     send_to_socket_noconfirm(clients[NUM_READERS+n].cs, "bnds", 4);
     send_to_socket_noconfirm(clients[NUM_READERS+n].cs,
-			     clients[NUM_READERS+n].bounds, sizeof(float)*6);
+                             clients[NUM_READERS+n].bounds, sizeof(float)*6);
   }
   rw_socket_close(script, pid);
 }
@@ -193,15 +193,15 @@ void decide_chunks_for_memory_balance() {
       divide_projection(pr + proj_start + i, chunks[dir], divisions);
       divisions[chunks[dir]] = BOX_SIZE;
       for (j=0; j<chunks[dir]; j++) {
-	offset = i*chunks[dir]+j;
-	bnds = (dir < 2) ? pr[proj_start+todo+offset].bounds
-	  : clients[NUM_READERS+offset].bounds;
-	populate_bounds(dir, pr[proj_start+i].bounds, bnds, 
-			divisions[j], divisions[j+1]);
-	if (dir == 2) {
-	  send_to_socket_noconfirm(clients[NUM_READERS+offset].cs, "bnds", 4);
-	  send_to_socket_noconfirm(clients[NUM_READERS+offset].cs, bnds, sizeof(float)*6);
-	}
+        offset = i*chunks[dir]+j;
+        bnds = (dir < 2) ? pr[proj_start+todo+offset].bounds
+          : clients[NUM_READERS+offset].bounds;
+        populate_bounds(dir, pr[proj_start+i].bounds, bnds,
+                        divisions[j], divisions[j+1]);
+        if (dir == 2) {
+          send_to_socket_noconfirm(clients[NUM_READERS+offset].cs, "bnds", 4);
+          send_to_socket_noconfirm(clients[NUM_READERS+offset].cs, bnds, sizeof(float)*6);
+        }
       }
     }
 
@@ -232,66 +232,66 @@ void load_balance(void) {
     for (i=NUM_READERS; i<num_clients; i++) {
       if (!check_rsocket_tag(clients[i].cs)) continue;
       recv_from_socket(clients[i].cs, cmd, 4);
-      
+
       if (!strcmp(cmd, "hcnt")) {
-	assert(clients[i].status == 2);
-	recv_from_socket(clients[i].cs, &(clients[i].num_halos), sizeof(int64_t));
-	clients[i].status = 3;
-	send_to_socket_noconfirm(clients[i].cs, "outp", 4);
-	send_to_socket_noconfirm(clients[i].cs, &id_offset, sizeof(int64_t));
-	id_offset += clients[i].num_halos;
+        assert(clients[i].status == 2);
+        recv_from_socket(clients[i].cs, &(clients[i].num_halos), sizeof(int64_t));
+        clients[i].status = 3;
+        send_to_socket_noconfirm(clients[i].cs, "outp", 4);
+        send_to_socket_noconfirm(clients[i].cs, &id_offset, sizeof(int64_t));
+        id_offset += clients[i].num_halos;
       }
 
       else if (!strcmp(cmd, "err!")) {
-	protocol_check(cmd, "err!");
-	return;
+        protocol_check(cmd, "err!");
+        return;
       }
 
       else if (!strcmp(cmd, "done")) {
-	assert(clients[i].status != 4);
-	clients[i].status = 4;
-	done++;
+        assert(clients[i].status != 4);
+        clients[i].status = 4;
+        done++;
       }
 
       else if (!strcmp(cmd, "nmwk")) {
-	recv_from_socket(clients[i].cs, &id, sizeof(int64_t));
-	if (id < 0) id = i;
-	clients[id].workers--;
-	if (!clients[id].status) clients[id].status = 1;
-	if ((clients[id].status == 1) && !(clients[id].workers)) {
-	  clients[id].status = 2;
-	  num_finished++;
-	}
-	while (no_more_work < num_clients && clients[no_more_work].status) 
-	  no_more_work++;
-	while (next_assigned >= NUM_READERS && clients[next_assigned].status)
-	  next_assigned--;
-	if (next_assigned < no_more_work) next_assigned = num_clients-1;
-	while (next_assigned >= NUM_READERS && clients[next_assigned].status)
-	  next_assigned--;
-	if (next_assigned < no_more_work)
-	  send_to_socket_noconfirm(clients[i].cs, "fini", 4);
-	else {
-	  send_to_socket_noconfirm(clients[i].cs, "work", 4);
-	  send_to_socket_noconfirm(clients[i].cs, &next_assigned, sizeof(int64_t));
-	  send_to_socket_noconfirm(clients[i].cs,clients[next_assigned].address,
-		   strlen(clients[next_assigned].address)+1);
-	  send_to_socket_noconfirm(clients[i].cs, clients[next_assigned].serv_port,
-		   strlen(clients[next_assigned].serv_port)+1);
-	  clients[next_assigned].workers++;
-	  next_assigned--;
-	}
+        recv_from_socket(clients[i].cs, &id, sizeof(int64_t));
+        if (id < 0) id = i;
+        clients[id].workers--;
+        if (!clients[id].status) clients[id].status = 1;
+        if ((clients[id].status == 1) && !(clients[id].workers)) {
+          clients[id].status = 2;
+          num_finished++;
+        }
+        while (no_more_work < num_clients && clients[no_more_work].status)
+          no_more_work++;
+        while (next_assigned >= NUM_READERS && clients[next_assigned].status)
+          next_assigned--;
+        if (next_assigned < no_more_work) next_assigned = num_clients-1;
+        while (next_assigned >= NUM_READERS && clients[next_assigned].status)
+          next_assigned--;
+        if (next_assigned < no_more_work)
+          send_to_socket_noconfirm(clients[i].cs, "fini", 4);
+        else {
+          send_to_socket_noconfirm(clients[i].cs, "work", 4);
+          send_to_socket_noconfirm(clients[i].cs, &next_assigned, sizeof(int64_t));
+          send_to_socket_noconfirm(clients[i].cs,clients[next_assigned].address,
+                   strlen(clients[next_assigned].address)+1);
+          send_to_socket_noconfirm(clients[i].cs, clients[next_assigned].serv_port,
+                   strlen(clients[next_assigned].serv_port)+1);
+          clients[next_assigned].workers++;
+          next_assigned--;
+        }
       }
- 
+
       else { fprintf(stderr, "[Error] Client protocol error! (%s) (%"PRId64")\n", cmd, i-NUM_READERS);
-	shutdown_clients();
-	exit(0);
+        shutdown_clients();
+        exit(0);
       }
     }
     if (num_finished == NUM_WRITERS && !sent_all_clear) {
       sent_all_clear = 1;
       for (i=NUM_READERS; i<num_clients; i++)
-	send_to_socket_noconfirm(clients[i].cs, "allc", 4);
+        send_to_socket_noconfirm(clients[i].cs, "allc", 4);
     }
   }
 }

@@ -1,6 +1,6 @@
 //string(a,b) real(a,b) integer(a,b)
-//Sets strings, floats, and integers; 
-//     "a" is the variable name; 
+//Sets strings, floats, and integers;
+//     "a" is the variable name;
 //     "b" is the default.
 
 string(FILE_FORMAT, "GADGET2");

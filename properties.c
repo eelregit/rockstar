@@ -94,7 +94,7 @@ void calc_basic_halo_props(struct halo *h) {
 
   h->m = h->num_p;
   if (!h->num_child_particles) h->num_child_particles = h->num_p;
-  
+
   h->r = cbrt(h->num_p/((4.0*M_PI/3.0)*particle_rvir_dens));
   h->child_r = cbrt(h->num_child_particles/((4.0*M_PI/3.0)*particle_rvir_dens));
   estimate_vmax(h);
@@ -131,7 +131,7 @@ void _calc_num_child_particles(struct halo *h) {
 void calc_num_child_particles(int64_t h_start) {
   int64_t i;
   for (i=h_start; i<num_halos; i++) halos[i].num_child_particles = 0;
-  for (i=h_start; i<num_halos; i++) 
+  for (i=h_start; i<num_halos; i++)
     if (!halos[i].num_child_particles) _calc_num_child_particles(halos + i);
 }
 
@@ -150,7 +150,7 @@ void calculate_corevel(struct halo *h, struct potential *po, int64_t total_p) {
   for (j=total_p-1; j>=0; j--)
     if (po[j].r2*100.0 < po[rvir_max].r2) break;
   core_max = j;
-  
+
   if (core_max < 100) core_max = 100;
 
   for (i=0; i<rvir_max; i++) {
@@ -164,9 +164,9 @@ void calculate_corevel(struct halo *h, struct potential *po, int64_t total_p) {
       if (i > 3) bestvar = thisvar / (double)((i-3)*i);
       else bestvar = 0;
       if (i < core_max) {
-	h->n_core = i;
-	h->min_vel_err = bestvar;
-	for (j=0; j<3; j++) h->corevel[j] = vel[j];
+        h->n_core = i;
+        h->min_vel_err = bestvar;
+        for (j=0; j<3; j++) h->corevel[j] = vel[j];
       }
       for (j=0; j<3; j++) h->bulkvel[j] = vel[j];
       h->min_bulkvel_err = bestvar;
@@ -205,23 +205,23 @@ void calc_shape(struct halo *h, int64_t total_p, int64_t bound) {
       if (bound && (po[j].pe < po[j].ke)) continue;
       r=0;
       for (k=0; k<3; k++) {
-	for (dr=0,l=0; l<3; l++) {
-	  dr += orth[k][l]*(po[j].pos[l]-h->pos[l]);
-	}
-	r += dr*dr/eig[k];
+        for (dr=0,l=0; l<3; l++) {
+          dr += orth[k][l]*(po[j].pos[l]-h->pos[l]);
+        }
+        r += dr*dr/eig[k];
       }
       if (r < min_r) r = min_r;
       if (!(r>0 && r<=1)) continue;
       double tw = (WEIGHTED_SHAPES) ? 1.0/r : 1.0;
       weight+=tw;
       for (k=0; k<3; k++) {
-	dr = po[j].pos[k]-h->pos[k];
-	mass_t[k][k] += dr*dr*tw;
-	for (l=0; l<k; l++) {
-	  dr2 = po[j].pos[l]-h->pos[l];
-	  mass_t[k][l] += dr2*dr*tw;
-	  mass_t[l][k] = mass_t[k][l];
-	}
+        dr = po[j].pos[k]-h->pos[k];
+        mass_t[k][k] += dr*dr*tw;
+        for (l=0; l<k; l++) {
+          dr2 = po[j].pos[l]-h->pos[l];
+          mass_t[k][l] += dr2*dr*tw;
+          mass_t[l][k] = mass_t[k][l];
+        }
       }
     }
 
@@ -236,7 +236,7 @@ void calc_shape(struct halo *h, int64_t total_p, int64_t bound) {
     b_to_a = sqrt(eig[b]/eig[a]);
     c_to_a = sqrt(eig[c]/eig[a]);
     if ((fabs(b_to_a-h->b_to_a) < 0.01*h->b_to_a) &&
-	(fabs(c_to_a-h->c_to_a) < 0.01*h->c_to_a)) return;
+        (fabs(c_to_a-h->c_to_a) < 0.01*h->c_to_a)) return;
     h->b_to_a = (b_to_a > 0) ? b_to_a : 0;
     h->c_to_a = (c_to_a > 0) ? c_to_a : 0;
     r = sqrt(eig[a]);
@@ -269,7 +269,7 @@ void _calc_pseudo_evolution_masses(struct halo *h, int64_t total_p, int64_t boun
 {
   int64_t j, num_part = 0, num_part_pe_d = 0;
   double r, r32, max_pe_b = 0;
- 
+
   //Typical: R_s*4.0; Minimum thresh: R_halo/5.0
   double r_pe_d = h->rs*4.0;
   //double r_pe_b = 0;
@@ -286,7 +286,7 @@ void _calc_pseudo_evolution_masses(struct halo *h, int64_t total_p, int64_t boun
       max_pe_b = (double)(num_part*num_part) / r32;
       //r_pe_b = r;
     }
-    
+
     if (r < r_pe_d) num_part_pe_d = num_part;
   }
   //  if (h->m > 1e13) fprintf(stderr, "%f %f\n", r_pe_b*1e3, h->rs);
@@ -316,7 +316,7 @@ void _calc_additional_halo_props(struct halo *h, int64_t total_p, int64_t bound)
     r = sqrt(po[j].r2);
     if (r < FORCE_RES) r = FORCE_RES;
     cur_dens = ((double)num_part/(r*r*r));
-    
+
     if (cur_dens > dens_thresh) {
       part_mdelta = num_part;
       dens_tot = j;
@@ -331,8 +331,8 @@ void _calc_additional_halo_props(struct halo *h, int64_t total_p, int64_t bound)
       circ_v = (double)num_part/r;
       np_vir = num_part;
       if (part_mdelta && circ_v > vmax) {
-	vmax = circ_v;
-	rvmax = r;
+        vmax = circ_v;
+        rvmax = r;
       }
     }
   }
@@ -357,7 +357,7 @@ void _calc_additional_halo_props(struct halo *h, int64_t total_p, int64_t bound)
   for (k=0; k<3; k++) vrms[k] = (parts_avgd>0) ? (vrms[k]/parts_avgd) : 0;
   if ((!bound) == (!BOUND_PROPS)) { //Works even if BOUND_PROPS > 1
     h->Xoff = h->Voff = 0;
-    for (k=0; k<3; k++) { 
+    for (k=0; k<3; k++) {
       ds = xavg[k]-h->pos[k]; h->Xoff += ds*ds;
       ds = vavg[k]-h->pos[k+3]; h->Voff += ds*ds;
     }
@@ -367,7 +367,7 @@ void _calc_additional_halo_props(struct halo *h, int64_t total_p, int64_t bound)
     h->alt_m[3] = np_alt[3]*PARTICLE_MASS;
     h->Xoff = sqrt(h->Xoff)*1e3;
     h->Voff = sqrt(h->Voff);
-    h->vrms = sqrt(vrms[0] + vrms[1] + vrms[2]); 
+    h->vrms = sqrt(vrms[0] + vrms[1] + vrms[2]);
     h->vmax = VMAX_CONST*sqrt(vmax*vmax_conv);
     h->rvmax = rvmax*1e3;
     h->halfmass_radius = sqrt(po[num_part_half].r2)*1e3;

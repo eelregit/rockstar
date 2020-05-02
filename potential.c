@@ -42,7 +42,7 @@ void _compute_direct_potential(struct potential *po, int64_t num_po) {
 }
 
 void _compute_indirect_potential(struct potential *po, int64_t num_po,
-				 struct potential *po2, int64_t num_po2) {
+                                 struct potential *po2, int64_t num_po2) {
   int64_t i, j;
   for (i=0; i<num_po; i++)
     for (j=0; j<num_po2; j++)
@@ -104,7 +104,7 @@ void _compute_mass_centers(struct tree3_node *n) {
   n->m = n->left->m + n->right->m;
   for (j=0; j<3; j++)
     n->mass_center[j] = n->m ? ((n->right->mass_center[j]*n->right->m +
-				 n->left->mass_center[j]*n->left->m)/n->m) : 0;
+                                 n->left->mass_center[j]*n->left->m)/n->m) : 0;
   _compute_dmin(n);
 }
 
@@ -133,7 +133,7 @@ void _compute_monopole_potentials(struct tree3_node *n, struct tree3_node *n2) {
     if (n2->div_dim < 0) {
       assert(i<3);
       _compute_indirect_potential(n->points, n->num_unbound,
-				  n2->points, n2->num_points);
+                                  n2->points, n2->num_points);
     } else {
       _compute_monopole_potentials(n, n2->left);
       _compute_monopole_potentials(n, n2->right);

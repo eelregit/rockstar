@@ -22,7 +22,7 @@ int main(int argc, char **argv)
     if (!strcmp("-s", argv[i])) { snap = atoi(argv[i+1]); i++; }
   }
   if (!did_config) do_config(NULL);
-  if (strlen(SNAPSHOT_NAMES)) 
+  if (strlen(SNAPSHOT_NAMES))
     read_input_names(SNAPSHOT_NAMES, &snapnames, &NUM_SNAPS);
   if (strlen(BLOCK_NAMES))
     read_input_names(BLOCK_NAMES, &blocknames, &NUM_BLOCKS);

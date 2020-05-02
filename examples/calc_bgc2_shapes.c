@@ -80,43 +80,43 @@ int main(int argc, char **argv) {
       memset(&h, 0, sizeof(struct halo));
       check_realloc_var(po, sizeof(struct potential), max_p, grps[j].npart);
       for (k=0; k<grps[j].npart; k++) {
-	memcpy(po[k].pos, parts[p_start+k].pos, sizeof(float)*3);
-	memcpy(po[k].pos+3, parts[p_start+k].vel, sizeof(float)*3);
-	for (int64_t l=0; l<3; l++) bulkvel[l] += po[k].pos[l+3];
-	po[k].pe = po[k].ke = 0;
-	po[k].flags = 0;
-	po[k].r2 = calc_distance2(grps[j].pos, po[k].pos, hdr.box_size);
+        memcpy(po[k].pos, parts[p_start+k].pos, sizeof(float)*3);
+        memcpy(po[k].pos+3, parts[p_start+k].vel, sizeof(float)*3);
+        for (int64_t l=0; l<3; l++) bulkvel[l] += po[k].pos[l+3];
+        po[k].pe = po[k].ke = 0;
+        po[k].flags = 0;
+        po[k].r2 = calc_distance2(grps[j].pos, po[k].pos, hdr.box_size);
       }
       memcpy(h.pos, grps[j].pos, sizeof(float)*3);
       memcpy(h.pos+3, grps[j].vel, sizeof(float)*3);
       if (grps[j].npart > 0)
-	for (int64_t l=0; l<3; l++) bulkvel[l] /= (float)grps[j].npart;
+        for (int64_t l=0; l<3; l++) bulkvel[l] /= (float)grps[j].npart;
       if (BOUND_PROPS) {
-	compute_potential(po, grps[j].npart);
-	compute_kinetic_energy(po, grps[j].npart, bulkvel, h.pos);
+        compute_potential(po, grps[j].npart);
+        compute_kinetic_energy(po, grps[j].npart, bulkvel, h.pos);
       }
       qsort(po, grps[j].npart, sizeof(struct potential), dist_compare);
 
       h.r = 0;
       for (k=grps[j].npart-1; k>=0; k--) {
-	double dens = (k+1)*PARTICLE_MASS;
-	double r = sqrt(po[k].r2);
-	if (dens/(r*r*r) >= dens_thresh) break;
+        double dens = (k+1)*PARTICLE_MASS;
+        double r = sqrt(po[k].r2);
+        if (dens/(r*r*r) >= dens_thresh) break;
       }
       if (k>=0) h.r = po[k].r2;
       double pos[3] = {0};
       for (k=0; k<grps[j].npart; k++) {
-	for (int64_t l=0; l<3; l++) pos[l] += po[k].pos[l];
-	if (po[k].r2 > rfrac*rfrac*h.r) break;
+        for (int64_t l=0; l<3; l++) pos[l] += po[k].pos[l];
+        if (po[k].r2 > rfrac*rfrac*h.r) break;
       }
 
       h.r = rfrac*sqrt(h.r)*1e3;
       h.m = (h.r) ? (k+1)*PARTICLE_MASS : 0;
       if (USE_COM && h.r)
-	for (int64_t l=0; l<3; l++) h.pos[l] = pos[l]/(double)(k+1);
+        for (int64_t l=0; l<3; l++) h.pos[l] = pos[l]/(double)(k+1);
       calc_shape(&h, k, BOUND_PROPS);
       printf("%"PRId64" %"PRId64" %e %f %f %f %f %f %f %f %f %e %f %f %f %f %f\n",
-	     grps[j].id, grps[j].parent_id, grps[j].mass, 1e3*grps[j].radius, grps[j].vmax, grps[j].pos[0], grps[j].pos[1], grps[j].pos[2], grps[j].vel[0], grps[j].vel[1], grps[j].vel[2], (k+1)*PARTICLE_MASS, h.A[0], h.A[1], h.A[2], h.b_to_a, h.c_to_a);
+             grps[j].id, grps[j].parent_id, grps[j].mass, 1e3*grps[j].radius, grps[j].vmax, grps[j].pos[0], grps[j].pos[1], grps[j].pos[2], grps[j].vel[0], grps[j].vel[1], grps[j].vel[2], (k+1)*PARTICLE_MASS, h.A[0], h.A[1], h.A[2], h.b_to_a, h.c_to_a);
       p_start += grps[j].npart;
     }
   }

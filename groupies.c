@@ -90,7 +90,7 @@ void calc_mass_definition(void) {
   particle_rvir_dens = _calc_mass_definition(&vir);
   dynamical_time = 1.0/sqrt((4.0*M_PI*Gc/3.0)*particle_rvir_dens*PARTICLE_MASS);
   min_dens_index = 0;
-  for (i=1; i<5; i++) 
+  for (i=1; i<5; i++)
     if (particle_thresh_dens[i] < particle_thresh_dens[min_dens_index])
       min_dens_index = i;
 }
@@ -109,13 +109,13 @@ void add_new_halo(void) {
   int64_t i;
   if ((num_halos % 1000)==0) {
     halos = check_realloc(halos, sizeof(struct halo)*(num_halos+1000),
-			  "Allocating room for halos.");
+                          "Allocating room for halos.");
     extra_info = check_realloc(extra_info, sizeof(struct extra_halo_info)*(num_halos+1000),
-			  "Allocating room for extra halo info.");
+                          "Allocating room for extra halo info.");
     memset(halos+num_halos, 0, sizeof(struct halo)*1000);
     for (i=num_halos; i<num_halos+1000; i++) {
-      extra_info[i].child = extra_info[i].next_cochild = 
-	extra_info[i].ph = extra_info[i].prev_cochild = extra_info[i].sub_of = -1;
+      extra_info[i].child = extra_info[i].next_cochild =
+        extra_info[i].ph = extra_info[i].prev_cochild = extra_info[i].sub_of = -1;
       extra_info[i].max_metric = 0;
       halos[i].flags |= GROWING_FLAG;
     }
@@ -126,14 +126,14 @@ void add_new_halo(void) {
 void add_more_halo_ids(void) {
   num_alloced_halo_ids+=1000;
   halo_ids = check_realloc(halo_ids, sizeof(int64_t)*num_alloced_halo_ids,
-			   "Allocating room for halo ids.");
+                           "Allocating room for halo ids.");
 }
 
 void add_more_growing_halos(void) {
   num_alloc_gh += 1000;
   growing_halos = check_realloc(growing_halos, sizeof(struct halo *)
-				*num_alloc_gh,
-				"Allocating room for growing halos.");
+                                *num_alloc_gh,
+                                "Allocating room for growing halos.");
 }
 
 int dist_compare(const void *a, const void *b) {
@@ -213,8 +213,8 @@ void _find_subfofs_better2(struct fof *f,  float thresh) {
   for (i=0; i<num_test; i++) {
     if (num_test == f->num_p) j = i;
     else { j = rand(); j<<=31; j+=rand(); j%=(f->num_p); }
-    particle_r[i] = fast3tree_find_next_closest_distance(phasetree, res, 
-			     f->particles[j].pos);
+    particle_r[i] = fast3tree_find_next_closest_distance(phasetree, res,
+                             f->particles[j].pos);
   }
   target_r = find_median_r(particle_r, num_test, thresh);
   _find_subfofs_at_r(f, target_r);
@@ -247,7 +247,7 @@ int could_be_poisson_or_force_res(struct halo *h1, struct halo *h2, int64_t *is_
   mve = h1->min_vel_err;
   dx = (r / mpe + v / mve) / 2.0;
   if (!(dx > 100)) return 1;
-  
+
   r = sqrt(r);
   v = sqrt(v);
   if ((h1->r+h2->r > r) && (1.5*(h1->vrms+h2->vrms)) > v &&
@@ -259,7 +259,7 @@ int could_be_poisson_or_force_res(struct halo *h1, struct halo *h2, int64_t *is_
 }
 
 int64_t _find_biggest_parent(int64_t h_start, int64_t use_temporal_info,
-			     int64_t growing) {
+                             int64_t growing) {
   int64_t i, j, max_i = h_start, num_m1, num_m2;
   float m1 = -1, max_vmax = 0, dx,ds, min_ds=0;
   if (growing) {
@@ -270,7 +270,7 @@ int64_t _find_biggest_parent(int64_t h_start, int64_t use_temporal_info,
     if (growing && !(halos[i].flags & GROWING_FLAG)) continue;
     if (halos[i].vmax > halos[max_i].vmax) max_i = i;
     if (halos[i].vmax == halos[max_i].vmax &&
-	halos[i].num_p > halos[max_i].num_p) max_i = i;
+        halos[i].num_p > halos[max_i].num_p) max_i = i;
   }
 
   max_vmax = halos[max_i].vmax;
@@ -279,8 +279,8 @@ int64_t _find_biggest_parent(int64_t h_start, int64_t use_temporal_info,
       if (i==max_i) continue;
       if (growing && !(halos[i].flags & GROWING_FLAG)) continue;
       if (max_vmax*0.6 < halos[i].vmax) {
-	for (dx=0,j=0; j<3; j++) { ds=halos[i].pos[j]-halos[max_i].pos[j]; dx+=ds*ds; }
-	if (!min_ds || min_ds > dx) min_ds = dx;
+        for (dx=0,j=0; j<3; j++) { ds=halos[i].pos[j]-halos[max_i].pos[j]; dx+=ds*ds; }
+        if (!min_ds || min_ds > dx) min_ds = dx;
       }
     }
     min_ds = sqrt(min_ds)/3.0;
@@ -289,19 +289,19 @@ int64_t _find_biggest_parent(int64_t h_start, int64_t use_temporal_info,
       if (i==max_i) continue;
       if (growing && !(halos[i].flags & GROWING_FLAG)) continue;
       if (max_vmax*0.6 < halos[i].vmax) {
-	if (m1 < 0)
-	  m1 = find_previous_mass(halos+max_i, copies+halos[max_i].p_start,
-				  &num_m1, min_ds);
-	float m2 = find_previous_mass(halos+i, copies + halos[i].p_start,
-				      &num_m2, min_ds);
-	if (m1 && m2 && ((m2 > m1) || ((m2 == m1) && (num_m2 > num_m1)))) {
-	  max_i = i;
-	  m1 = m2;
-	  num_m1 = num_m2;
-	}
+        if (m1 < 0)
+          m1 = find_previous_mass(halos+max_i, copies+halos[max_i].p_start,
+                                  &num_m1, min_ds);
+        float m2 = find_previous_mass(halos+i, copies + halos[i].p_start,
+                                      &num_m2, min_ds);
+        if (m1 && m2 && ((m2 > m1) || ((m2 == m1) && (num_m2 > num_m1)))) {
+          max_i = i;
+          m1 = m2;
+          num_m1 = num_m2;
+        }
       }
     }
-  }  
+  }
   return max_i;
 }
 
@@ -310,7 +310,7 @@ void _fix_parents(int64_t h_start) {
   float m1, m2, dx, ds;
 
   for (i=h_start; i<num_halos; i++) {
-    extra_info[i].next_cochild = extra_info[i].prev_cochild = 
+    extra_info[i].next_cochild = extra_info[i].prev_cochild =
       extra_info[i].child = -1;
     if (extra_info[i].sub_of == i) extra_info[i].sub_of = -1;
   }
@@ -320,20 +320,20 @@ void _fix_parents(int64_t h_start) {
       sub_of = extra_info[i].sub_of;
       if (sub_of == i) sub_of = extra_info[i].sub_of = -1;
       if (sub_of > -1 && halos[i].vmax > 0.6*halos[sub_of].vmax) {
-	for (dx=0,j=0; j<3; j++) { ds=halos[i].pos[j]-halos[sub_of].pos[j]; dx+=ds*ds; }
-	dx = sqrt(dx)/3.0;
-	m2 = find_previous_mass(halos+i, copies+halos[i].p_start, &num_m2, dx);
-	m1 = find_previous_mass(halos+sub_of, copies+halos[sub_of].p_start,
-				&num_m1, dx);
-	if (m1 && m2 && ((m2 > m1) || ((m2 == m1) && (num_m2 > num_m1)))) {
-	  extra_info[i].sub_of = extra_info[sub_of].sub_of;
-	  extra_info[sub_of].sub_of = i;
-	  if (extra_info[sub_of].sub_of == sub_of) 
-	    extra_info[sub_of].sub_of = -1;
-	  i--;
-	}
+        for (dx=0,j=0; j<3; j++) { ds=halos[i].pos[j]-halos[sub_of].pos[j]; dx+=ds*ds; }
+        dx = sqrt(dx)/3.0;
+        m2 = find_previous_mass(halos+i, copies+halos[i].p_start, &num_m2, dx);
+        m1 = find_previous_mass(halos+sub_of, copies+halos[sub_of].p_start,
+                                &num_m1, dx);
+        if (m1 && m2 && ((m2 > m1) || ((m2 == m1) && (num_m2 > num_m1)))) {
+          extra_info[i].sub_of = extra_info[sub_of].sub_of;
+          extra_info[sub_of].sub_of = i;
+          if (extra_info[sub_of].sub_of == sub_of)
+            extra_info[sub_of].sub_of = -1;
+          i--;
+        }
       }
-    }    
+    }
   }
 
   for (i=h_start; i<num_halos; i++) {
@@ -359,9 +359,9 @@ void output_level(int64_t p_start, int64_t p_end, int64_t h_start, int64_t level
   FILE *output = check_fopen(buffer, "a");
   for (i=p_start; i<p_end; i++) {
     fprintf(output, "%f %f %f %f %f %f %"PRId64" %"PRId64" %"PRId64"\n",
-	    copies[i].pos[0], copies[i].pos[1], copies[i].pos[2], 
-	    copies[i].pos[3], copies[i].pos[4], copies[i].pos[5], 
-	    p[copies[i].id].id, particle_halos[i], level);
+            copies[i].pos[0], copies[i].pos[1], copies[i].pos[2],
+            copies[i].pos[3], copies[i].pos[4], copies[i].pos[5],
+            p[copies[i].id].id, particle_halos[i], level);
   }
   fclose(output);
 
@@ -369,11 +369,11 @@ void output_level(int64_t p_start, int64_t p_end, int64_t h_start, int64_t level
   output = check_fopen(buffer, "a");
   for (i=h_start; i<num_halos; i++) {
     fprintf(output, "%f %f %f %f %f %f %"PRId64" %"PRId64" %f %f %f %f %"PRId64" %"PRId64" %"PRId64"\n",
-	    halos[i].pos[0], halos[i].pos[1], halos[i].pos[2], 
-	    halos[i].bulkvel[0], halos[i].bulkvel[1], halos[i].bulkvel[2], 
-	    halos[i].num_p, halos[i].num_child_particles, 
-	    halos[i].r, halos[i].vrms, sqrt(halos[i].min_pos_err), 
-	    sqrt(halos[i].min_vel_err), i, extra_info[i].sub_of, level);
+            halos[i].pos[0], halos[i].pos[1], halos[i].pos[2],
+            halos[i].bulkvel[0], halos[i].bulkvel[1], halos[i].bulkvel[2],
+            halos[i].num_p, halos[i].num_child_particles,
+            halos[i].r, halos[i].vrms, sqrt(halos[i].min_pos_err),
+            sqrt(halos[i].min_vel_err), i, extra_info[i].sub_of, level);
   }
   fclose(output);
 }
@@ -422,9 +422,9 @@ void _find_subs(struct fof *f, int64_t level) {
       halos[i].flags -= (halos[i].flags & GROWING_FLAG);
       extra_info[i].sub_of = max_i;
       if (!is_force_res) {
-	for (j=0; j<halos[i].num_p; j++)
-	  particle_halos[halos[i].p_start+j] = max_i;
-	halos[i].num_p = 0;
+        for (j=0; j<halos[i].num_p; j++)
+          particle_halos[halos[i].p_start+j] = max_i;
+        halos[i].num_p = 0;
       }
       continue;
     }
@@ -436,21 +436,21 @@ void _find_subs(struct fof *f, int64_t level) {
   if (num_growing_halos==1) {
     for (j=0; j<f->num_p; j++)
       if (particle_halos[p_start + j] < 0)
-	particle_halos[p_start + j] = max_i;
+        particle_halos[p_start + j] = max_i;
   } else {
     build_subtree(growing_halos, num_growing_halos);
     for (j=0; j<f->num_p; j++) {
       if (particle_halos[p_start + j] < 0) {
-	struct halo *h = find_best_halo(copies+p_start+j, halos+max_i);
-	particle_halos[p_start + j] = h - halos;
-	while (extra_info[h-halos].sub_of > -1) {
-	  float max_metric = extra_info[h-halos].max_metric;
-	  if (calc_particle_dist(h, copies+p_start+j) > max_metric) {
-	    particle_halos[p_start + j] = extra_info[h-halos].sub_of;
-	    h = halos + extra_info[h-halos].sub_of;
-	  }
-	  else break;
-	}
+        struct halo *h = find_best_halo(copies+p_start+j, halos+max_i);
+        particle_halos[p_start + j] = h - halos;
+        while (extra_info[h-halos].sub_of > -1) {
+          float max_metric = extra_info[h-halos].max_metric;
+          if (calc_particle_dist(h, copies+p_start+j) > max_metric) {
+            particle_halos[p_start + j] = extra_info[h-halos].sub_of;
+            h = halos + extra_info[h-halos].sub_of;
+          }
+          else break;
+        }
       }
     }
   }
@@ -460,11 +460,11 @@ void _find_subs(struct fof *f, int64_t level) {
       if (extra_info[i].ph < 0 || extra_info[i].sub_of < 0) continue;
       int64_t sub_of = extra_info[i].sub_of;
       if (extra_info[i].ph == extra_info[sub_of].ph &&
-	  extra_info[i].max_metric < 1.5) {
-	extra_info[i].ph = -1;
-	for (j=halos[i].p_start; j<halos[i].num_p+halos[i].p_start; j++)
-	  particle_halos[j] = sub_of;
-	halos[i].num_p = halos[i].r = halos[i].vrms = 0;
+          extra_info[i].max_metric < 1.5) {
+        extra_info[i].ph = -1;
+        for (j=halos[i].p_start; j<halos[i].num_p+halos[i].p_start; j++)
+          particle_halos[j] = sub_of;
+        halos[i].num_p = halos[i].r = halos[i].vrms = 0;
       }
     }
   }
@@ -474,7 +474,7 @@ void _find_subs(struct fof *f, int64_t level) {
   max_i = _find_biggest_parent(h_start, 0, 1);
   build_subtree(growing_halos, num_growing_halos);
   for (i=0; i<num_growing_halos; i++)
-    extra_info[growing_halos[i]-halos].sub_of = 
+    extra_info[growing_halos[i]-halos].sub_of =
       find_best_parent(growing_halos[i], halos+max_i) - halos;
   _fix_parents(h_start);
   calc_num_child_particles(h_start);
@@ -489,14 +489,14 @@ void _find_subs(struct fof *f, int64_t level) {
     for (i=0; i<num_growing_halos; i++) growing_halos[i] = halos+h_start+i;
     for (i=0; i<num_growing_halos; i++) {
       calc_basic_halo_props(growing_halos[i]);
-      convert_and_sort_core_particles(growing_halos[i], 
-		copies + growing_halos[i]->p_start, 0, NULL);
+      convert_and_sort_core_particles(growing_halos[i],
+                copies + growing_halos[i]->p_start, 0, NULL);
     }
     build_subtree(growing_halos, num_growing_halos);
     max_i = _find_biggest_parent(h_start, 0, 0);
     for (i=0; i<num_growing_halos; i++)
-      extra_info[growing_halos[i]-halos].sub_of = 
-	find_best_parent(growing_halos[i], halos+max_i) - halos;
+      extra_info[growing_halos[i]-halos].sub_of =
+        find_best_parent(growing_halos[i], halos+max_i) - halos;
     _fix_parents(h_start);
     calc_num_child_particles(h_start);
   }
@@ -594,8 +594,8 @@ float find_median_r(float *rad, int64_t num_p, float frac) {
   assert(num_p>0);
   if (num_p < 2) return rad[0];
   while (1) {
-    pivot_index = rad_partition(rad, left, right, 
-				left + random_unit()*(right-left));
+    pivot_index = rad_partition(rad, left, right,
+                                left + random_unit()*(right-left));
     if (k == pivot_index || (rad[left]==rad[right-1])) return rad[k];
     if (k < pivot_index) right = pivot_index;
     else left = pivot_index+1;
@@ -623,7 +623,7 @@ void norm_sd(struct fof *f, float thresh) {
 
     for (j=0; j<6; j++)
       for (k=j; k<6; k++)
-	corr[j][k]+=f->particles[i].pos[j]*f->particles[i].pos[k];
+        corr[j][k]+=f->particles[i].pos[j]*f->particles[i].pos[k];
   }
 
   for (j=0; j<6; j++)
@@ -633,7 +633,7 @@ void norm_sd(struct fof *f, float thresh) {
   calc_deviations(corr, &sig_x, &sig_v);
   if (f->num_p == num_copies) sig_x *= INITIAL_METRIC_SCALING;
   //else sig_x *= CONTINUED_METRIC_SCALING;
-  
+
   if (!sig_x || !sig_v) return;
   for (i=0; i<f->num_p; i++)
     for (j=0; j<6; j++)
